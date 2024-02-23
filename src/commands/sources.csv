@@ -1,5 +1,5 @@
 name,linux,windows,macos
-zulu21,https://cdn.azul.com/zulu/bin/zulu21.32.17-ca-jdk21.0.2-linux_x64.tar.gz,,
-zulu17,https://cdn.azul.com/zulu/bin/zulu17.48.15-ca-jdk17.0.10-linux_x64.tar.gz,,
-zulu11,https://cdn.azul.com/zulu/bin/zulu11.70.15-ca-jdk11.0.22-linux_x64.tar.gz,,
-zulu8,https://cdn.azul.com/zulu/bin/zulu8.76.0.17-ca-jdk8.0.402-linux_i686.tar.gz,,
+zulu21,https://cdn.azul.com/zulu/bin/zulu21.32.17-ca-jdk21.0.2-linux_x64.tar.gz,https://cdn.azul.com/zulu/bin/zulu21.32.17-ca-jdk21.0.2-win_x64.zip?_gl=1*14dmzoc*_ga*MTg0NTAyMjU0LjE3MDg3MDUwMzU.*_ga_42DEGWGYD5*MTcwODcwNTAzNS4xLjEuMTcwODcwNTExMi40NC4wLjA.,
+zulu17,https://cdn.azul.com/zulu/bin/zulu17.48.15-ca-jdk17.0.10-linux_x64.tar.gz,https://cdn.azul.com/zulu/bin/zulu17.48.15-ca-jdk17.0.10-win_x64.zip?_gl=1*1nexba0*_ga*MTg0NTAyMjU0LjE3MDg3MDUwMzU.*_ga_42DEGWGYD5*MTcwODcwNTAzNS4xLjEuMTcwODcwNTE0Ny45LjAuMA..,
+zulu11,https://cdn.azul.com/zulu/bin/zulu11.70.15-ca-jdk11.0.22-linux_x64.tar.gz,https://cdn.azul.com/zulu/bin/zulu11.70.15-ca-jdk11.0.22-win_x64.zip?_gl=1*2j7qzc*_ga*MTg0NTAyMjU0LjE3MDg3MDUwMzU.*_ga_42DEGWGYD5*MTcwODcwNTAzNS4xLjEuMTcwODcwNTIwNS4yNS4wLjA.,
+zulu8,https://cdn.azul.com/zulu/bin/zulu8.76.0.17-ca-jdk8.0.402-linux_i686.tar.gz,https://cdn.azul.com/zulu/bin/zulu8.76.0.17-ca-jdk8.0.402-win_x64.zip?_gl=1*i45ppb*_ga*MTg0NTAyMjU0LjE3MDg3MDUwMzU.*_ga_42DEGWGYD5*MTcwODcwNTAzNS4xLjEuMTcwODcwNTIxMy4xNy4wLjA.,

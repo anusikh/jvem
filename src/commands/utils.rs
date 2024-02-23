@@ -6,11 +6,20 @@ use std::{
 
 use lazy_static::lazy_static;
 
-lazy_static! {
-    static ref HOME_DIR: String = env::var("HOME").unwrap();
+fn get_home_env() -> String {
+    if env::consts::OS == "windows" {
+        "USERPROFILE".to_string()
+    } else {
+        "HOME".to_string()
+    }
 }
 
-pub fn run_linux_command(command: &str, args: Vec<&str>) -> Output {
+lazy_static! {
+    static ref HOME_DIR: String = env::var(get_home_env()).unwrap();
+}
+
+
+pub fn run_command(command: &str, args: Vec<&str>) -> Output {
     let output = Command::new(command).args(args).output().expect("failed");
     output
 }
@@ -37,6 +46,10 @@ pub fn find_file_in_dir(base_path: &str, name: &str) -> String {
 pub fn get_home_dir() -> String {
     let res = &HOME_DIR;
     res.to_string()
+}
+
+pub fn get_installation_dir(name: &str) -> String {
+    format!("{}\\.jvem\\{}", get_home_dir(), name)
 }
 
 pub fn check_jdk_exists(name: &str) -> bool {

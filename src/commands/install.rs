@@ -1,21 +1,85 @@
 use std::error::Error;
 
+use lazy_static::lazy_static;
+
 use crate::commands::{
     csv_ops::get_download_link,
-    utils::{get_home_dir, run_linux_command},
+    utils::{get_home_dir, get_installation_dir, run_command},
 };
 
 use super::utils::{check_jdk_exists, create_java_dir, find_file_in_dir};
+
+lazy_static! {
+    static ref SYSTEM_OS: String = std::env::consts::OS.to_string();
+}
+
+fn install_windows(name: String, link: String) {
+    match check_jdk_exists(&name) {
+        false => {
+            create_java_dir(&name);
+
+            let temp_directory = format!("{}\\AppData\\Local\\Temp\\{}.zip", get_home_dir(), name);
+            let output = run_command(
+                "powershell",
+                vec![
+                    "-Command",
+                    "Set-Variable ProgressPreference SilentlyContinue ;",
+                    "Invoke-WebRequest",
+                    "-outf",
+                    &temp_directory,
+                    "-Uri",
+                    &format!("{}", link),
+                ],
+            );
+
+            if output.status.success() {
+                println!("fetching zip successful");
+
+                let unzip_output = run_command(
+                    "powershell",
+                    vec![
+                        "-Command",
+                        &format!(
+                            "Expand-Archive -Path {} -DestinationPath {}; mv {}\\*\\* {}",
+                            &temp_directory,
+                            get_installation_dir(&name),
+                            get_installation_dir(&name),
+                            get_installation_dir(&name)
+                        ),
+                    ],
+                );
+
+                if unzip_output.status.success() {
+                    println!("unzipping successful");
+                } else {
+                    println!(
+                        "unzipping failed: {}",
+                        String::from_utf8_lossy(&unzip_output.stderr)
+                    );
+                }
+            } else {
+                println!(
+                    "fetching zip failed: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                );
+            }
+        }
+        true => {
+            println!("jdk already exists in fs");
+        }
+    }
+}
 
 fn install_linux(name: String, link: String) {
     match check_jdk_exists(&name) {
         false => {
             create_java_dir(&name);
 
-            let output =
-                run_linux_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
+            let output = run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
             if output.status.success() {
-                let tarball_status = run_linux_command(
+                println!("fetching tarball successful");
+
+                let tarball_status = run_command(
                     "/usr/bin/tar",
                     vec![
                         "xzf",
@@ -45,14 +109,6 @@ fn install_linux(name: String, link: String) {
 }
 
 pub fn install(name: String) {
-    // TODO:
-    // Check operating system x
-    // Get the list of the available jdks x
-    // Check if the name provided here matches any of these jdks x
-    // Installation process: all 3 os'es
-    // - wget the link x
-    // - tar unzip it
-    // store it in .jvem directory at base user
     println!(
         "triggered install with param {} {}",
         name,
@@ -61,7 +117,13 @@ pub fn install(name: String) {
 
     let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
     match res {
-        Ok(x) => install_linux(name, x),
+        Ok(x) => {
+            if *SYSTEM_OS == "linux".to_string() {
+                install_linux(name, x);
+            } else if *SYSTEM_OS == "windows".to_string() {
+                install_windows(name, x);
+            }
+        }
         Err(e) => {
             println!("{}", e.to_string());
         }
