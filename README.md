@@ -10,8 +10,17 @@ TODO:
 - install
     - macos
     - ~~linux~~ 
-    - windows
+    - ~~windows~~
 - ls (list all locally installed versions)
 - use
+    - macos
+    - linux 
+    - windows
 - uninstall
 - help
+- publishing pipeline
+- test cases
+- signal interrupt handling
+    - macos
+    - linux
+    - windows
