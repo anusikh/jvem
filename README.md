@@ -7,21 +7,18 @@ a java version manager
 
 TODO:
 - ~~lsrem~~
-- install
-    - macos
+- ~~install~~
     - ~~linux~~ 
     - ~~windows~~
-- ls (list all locally installed versions)
+- ~~ls (list all locally installed versions)~~
+- ~~improve command line outputs~~
 - use
-    - macos
-    - linux 
+    - linux
     - windows
 - uninstall
 - help
-- publishing pipeline
 - test cases
 - signal interrupt handling
-    - macos
     - linux
     - windows
-- improve command line outputs
+- publishing pipeline
