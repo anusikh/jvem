@@ -2,7 +2,7 @@ pub mod commands;
 
 use clap::Parser;
 
-use crate::commands::{install::install, lsrem::lsrem};
+use crate::commands::{install::install, ls::ls, lsrem::lsrem};
 
 #[derive(Parser)]
 struct Cli {
@@ -27,5 +27,7 @@ async fn main() {
                 println!("please mention a jdk name while running install");
             }
         }
+    } else if args.arg_type == "ls" {
+        let _  = ls();
     }
 }

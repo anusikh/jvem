@@ -24,3 +24,4 @@ TODO:
     - macos
     - linux
     - windows
+- improve command line outputs

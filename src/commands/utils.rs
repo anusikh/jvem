@@ -49,12 +49,12 @@ pub fn get_home_dir() -> String {
 }
 
 pub fn get_installation_dir(name: &str) -> String {
-    format!("{}\\.jvem\\{}", get_home_dir(), name)
+    format!("{}/.jvem/{}", get_home_dir(), name)
 }
 
 pub fn check_jdk_exists(name: &str) -> bool {
-    let dir_path = format!("{}/.jvem/{}", *HOME_DIR, name);
-    match Path::new(&dir_path).exists() {
+    let d_path = get_installation_dir(name);
+    match Path::new(&d_path).exists() {
         true => true,
         false => false,
     }
@@ -63,4 +63,20 @@ pub fn check_jdk_exists(name: &str) -> bool {
 pub fn create_java_dir(name: &str) {
     let new_dir_path = format!("{}/.jvem/{}", *HOME_DIR, name);
     fs::create_dir_all(new_dir_path).unwrap();
+}
+
+pub fn check_list_locally() {
+    let jvem_dir = format!("{}/.jvem/", get_home_dir());
+    let path_dir = Path::new(&jvem_dir);
+    match path_dir.exists() {
+        true => {
+            for entry in fs::read_dir(path_dir).unwrap() {
+                let entry = entry.unwrap();
+                println!("{:?}", entry.file_name());
+            }
+        },
+        false => {
+            println!("{}", "no jdk installations found locally");
+        }
+    }
 }

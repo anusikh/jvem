@@ -18,7 +18,7 @@ fn install_windows(name: String, link: String) {
         false => {
             create_java_dir(&name);
 
-            let temp_directory = format!("{}\\AppData\\Local\\Temp\\{}.zip", get_home_dir(), name);
+            let temp_directory = format!("{}/AppData/Local/Temp/{}.zip", get_home_dir(), name);
             let output = run_command(
                 "powershell",
                 vec![
