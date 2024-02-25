@@ -13,13 +13,14 @@ TODO:
     - ~~windows~~
 - ~~ls (list all locally installed versions)~~
 - ~~improve command line outputs~~
-- usev
-    - linux (create a new rc file and set env variables, include it in bashrc file, source it)
-    - ~~windows~~ (create a powershell profile, include it in the main profile, set aliases)
-- installation script (make sure this is added to .jvemrc and jvemprofile.ps1)
+- usev (will be done using symlinks)
+    - linux 
+    - ~~windows~~ 
+- installation script 
     - linux
-    - windows
+    - windows (make sure you add this to Path env: C:\Users\anusi\.jvem\java\bin)
 - deactivate
+- current
 - uninstall
 - help
 - test cases

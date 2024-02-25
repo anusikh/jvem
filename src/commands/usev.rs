@@ -1,12 +1,11 @@
 use super::utils::{
-    check_jdk_exists, create_powershell_profile, get_installation_dir, get_powershell_profile_path,
+    check_jdk_exists, get_installation_dir,
     run_command,
 };
 
 async fn usev_windows(name: String) {
-    create_powershell_profile();
 
-    let bin_path = format!("{}/bin", &get_installation_dir(&name));
+    let java_path = get_installation_dir(&name);
 
     let java_home_future = tokio::spawn(async move {
         println!("setting JAVA_HOME...");
@@ -28,12 +27,19 @@ async fn usev_windows(name: String) {
     });
 
     let alias_future = tokio::spawn(async move {
+        println!("{}", java_path);
+        let _ = run_command(
+            "powershell",
+            vec![
+                "-Command",
+                &format!("rm -r \\Users\\anusi\\.jvem\\java")
+            ],
+        );
         let output = run_command(
             "powershell",
             vec![
                 "-Command",
-                &format!("Add-Content -Path \"{1}\" -Value \"\n Set-Alias java {0}/java.exe\n Set-Alias javac {0}/javac.exe\"
-                ", bin_path, get_powershell_profile_path())
+                &format!("New-Item -Path C:\\Users\\anusi\\.jvem\\java -ItemType Junction -Value {}", java_path)
             ],
         );
         if output.status.success() {
