@@ -13,9 +13,13 @@ TODO:
     - ~~windows~~
 - ~~ls (list all locally installed versions)~~
 - ~~improve command line outputs~~
-- use
+- usev
+    - linux (create a new rc file and set env variables, include it in bashrc file, source it)
+    - ~~windows~~ (create a powershell profile, include it in the main profile, set aliases)
+- installation script (make sure this is added to .jvemrc and jvemprofile.ps1)
     - linux
-    - ~~windows~~
+    - windows
+- deactivate
 - uninstall
 - help
 - test cases
