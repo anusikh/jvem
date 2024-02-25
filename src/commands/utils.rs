@@ -1,7 +1,5 @@
 use std::{
-    env, fs,
-    path::Path,
-    process::{Command, Output},
+    env, fs, path::Path, process::{Command, Output}
 };
 
 use lazy_static::lazy_static;
@@ -17,7 +15,6 @@ fn get_home_env() -> String {
 lazy_static! {
     static ref HOME_DIR: String = env::var(get_home_env()).unwrap();
 }
-
 
 pub fn run_command(command: &str, args: Vec<&str>) -> Output {
     let output = Command::new(command).args(args).output().expect("failed");
@@ -65,6 +62,30 @@ pub fn create_java_dir(name: &str) {
     fs::create_dir_all(new_dir_path).unwrap();
 }
 
+pub fn get_powershell_profile_path() -> String {
+    format!("{}/.jvem/jvemprofile.ps1", *HOME_DIR)
+}
+
+pub fn create_powershell_profile() {
+    match Path::new(&get_powershell_profile_path()).exists() {
+        false => {
+            let _ = run_command(
+                "powershell",
+                vec![
+                    "-Command",
+                    &format!("echo '. {}' >> $profile", get_powershell_profile_path())
+                ],
+            );
+            let _ =
+                fs::File::create(format!("{}\\.jvem\\jvemprofile.ps1", get_home_dir())).unwrap();
+            println!("powershell profile added");
+        }
+        true => {
+            println!("powershell profile already exists")
+        }
+    }
+}
+
 pub fn check_list_locally() {
     let jvem_dir = format!("{}/.jvem/", get_home_dir());
     let path_dir = Path::new(&jvem_dir);
@@ -74,7 +95,7 @@ pub fn check_list_locally() {
                 let entry = entry.unwrap();
                 println!("{:?}", entry.file_name());
             }
-        },
+        }
         false => {
             println!("{}", "no jdk installations found locally");
         }

@@ -2,7 +2,7 @@ pub mod commands;
 
 use clap::Parser;
 
-use crate::commands::{install::install, ls::ls, lsrem::lsrem};
+use crate::commands::{install::install, ls::ls, lsrem::lsrem, usev::usev};
 
 #[derive(Parser)]
 struct Cli {
@@ -29,5 +29,14 @@ async fn main() {
         }
     } else if args.arg_type == "ls" {
         let _  = ls();
+    } else if args.arg_type == "usev" {
+        match args.arg {
+            Some(x) => {
+                let _ = usev(x).await;
+            }
+            None => {
+                println!("please mention a jdk name");
+            }
+        }
     }
 }

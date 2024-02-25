@@ -33,7 +33,7 @@ fn install_windows(name: String, link: String) {
             );
 
             if output.status.success() {
-                println!("fetching zip successful \n");
+                println!("fetching zip successful ");
 
                 let unzip_output = run_command(
                     "powershell",
@@ -50,22 +50,22 @@ fn install_windows(name: String, link: String) {
                 );
 
                 if unzip_output.status.success() {
-                    println!("unzipping successful \n");
+                    println!("unzipping successful ");
                 } else {
                     println!(
-                        "unzipping failed: {} \n",
+                        "unzipping failed: {} ",
                         String::from_utf8_lossy(&unzip_output.stderr)
                     );
                 }
             } else {
                 println!(
-                    "fetching zip failed: {} \n",
+                    "fetching zip failed: {} ",
                     String::from_utf8_lossy(&output.stderr)
                 );
             }
         }
         true => {
-            println!("jdk already exists in fs \n");
+            println!("jdk already exists in fs ");
         }
     }
 }
@@ -77,7 +77,7 @@ fn install_linux(name: String, link: String) {
 
             let output = run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
             if output.status.success() {
-                println!("fetching tarball successful \n");
+                println!("fetching tarball successful ");
 
                 let tarball_status = run_command(
                     "/usr/bin/tar",
@@ -91,26 +91,26 @@ fn install_linux(name: String, link: String) {
                 );
 
                 if tarball_status.status.success() {
-                    println!("tarball extraction successful \n");
+                    println!("tarball extraction successful ");
                 } else {
                     println!(
-                        "tarball extraction failed: {:?} \n",
+                        "tarball extraction failed: {:?} ",
                         String::from_utf8_lossy(&tarball_status.stderr)
                     );
                 }
             } else {
-                println!("fetching tarball failed \n");
+                println!("fetching tarball failed ");
             }
         }
         true => {
-            println!("jdk already exists in fs \n");
+            println!("jdk already exists in fs ");
         }
     }
 }
 
 pub fn install(name: String) {
     println!(
-        "triggered install with param {} {} \n",
+        "triggered install with param {} {} ",
         name,
         std::env::consts::OS
     );
@@ -125,7 +125,7 @@ pub fn install(name: String) {
             }
         }
         Err(e) => {
-            println!("{} \n", e.to_string());
+            println!("{} ", e.to_string());
         }
     }
 }
