@@ -18,7 +18,6 @@ lazy_static! {
     static ref HOME_DIR: String = env::var(get_home_env()).unwrap();
 }
 
-
 pub fn run_command(command: &str, args: Vec<&str>) -> Output {
     let output = Command::new(command).args(args).output().expect("failed");
     output
@@ -72,9 +71,11 @@ pub fn check_list_locally() {
         true => {
             for entry in fs::read_dir(path_dir).unwrap() {
                 let entry = entry.unwrap();
-                println!("{:?}", entry.file_name());
+                if entry.file_name() != "java" {
+                    println!("{}", entry.file_name().to_str().unwrap());
+                }
             }
-        },
+        }
         false => {
             println!("{}", "no jdk installations found locally");
         }
