@@ -4,3 +4,6 @@ pub mod install;
 pub mod csv_ops;
 pub mod utils;
 pub mod usev;
+pub mod deactivate;
+pub mod current;
+pub mod uninstall;

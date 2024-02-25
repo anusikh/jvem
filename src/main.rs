@@ -2,7 +2,10 @@ pub mod commands;
 
 use clap::Parser;
 
-use crate::commands::{install::install, ls::ls, lsrem::lsrem, usev::usev};
+use crate::commands::{
+    current::current, deactivate::deactivate, install::install, ls::ls, lsrem::lsrem,
+    uninstall::uninstall, usev::usev,
+};
 
 #[derive(Parser)]
 struct Cli {
@@ -16,27 +19,35 @@ async fn main() {
 
     println!("pattern: {:?}, path: {:?}", args.arg_type, args.arg);
 
-    if args.arg_type == "lsrem" {
-        let _ = lsrem();
-    } else if args.arg_type == "install" {
-        match args.arg {
+    let _ = match args.arg_type.as_str() {
+        "lsrem" => lsrem(),
+        "install" => Ok(match args.arg {
             Some(x) => {
-                let _ = install(x);
+                install(x);
             }
             None => {
-                println!("please mention a jdk name while running install");
+                println!("please mention a jdk");
             }
-        }
-    } else if args.arg_type == "ls" {
-        let _  = ls();
-    } else if args.arg_type == "usev" {
-        match args.arg {
+        }),
+        "ls" => Ok(ls()),
+        "usev" => Ok(match args.arg {
             Some(x) => {
                 let _ = usev(x).await;
             }
             None => {
-                println!("please mention a jdk name");
+                println!("please mention a jdk");
             }
-        }
-    }
+        }),
+        "deactivate" => Ok(deactivate()),
+        "current" => Ok(current()),
+        "uninstall" => Ok(match args.arg {
+            Some(x) => {
+                let _ = uninstall(x);
+            }
+            None => {
+                println!("please mention a jdk");
+            }
+        }),
+        _ => todo!(),
+    };
 }

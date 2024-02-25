@@ -1,19 +1,14 @@
 use std::error::Error;
 
-use lazy_static::lazy_static;
+use crate::commands::csv_ops::get_download_link;
 
-use crate::commands::{
-    csv_ops::get_download_link,
-    utils::{get_home_dir, get_installation_dir, run_command},
+use super::utils::{
+    check_jdk_exists, create_java_dir, find_file_in_dir, get_home_dir, get_installation_dir,
+    run_command,
 };
 
-use super::utils::{check_jdk_exists, create_java_dir, find_file_in_dir};
-
-lazy_static! {
-    static ref SYSTEM_OS: String = std::env::consts::OS.to_string();
-}
-
-fn install_windows(name: String, link: String) {
+#[cfg(target_os = "windows")]
+fn install_util(name: String, link: String) {
     match check_jdk_exists(&name) {
         false => {
             create_java_dir(&name);
@@ -40,11 +35,9 @@ fn install_windows(name: String, link: String) {
                     vec![
                         "-Command",
                         &format!(
-                            "Expand-Archive -Path {} -DestinationPath {}; mv {}\\*\\* {}",
+                            "Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1}",
                             &temp_directory,
                             get_installation_dir(&name),
-                            get_installation_dir(&name),
-                            get_installation_dir(&name)
                         ),
                     ],
                 );
@@ -70,7 +63,8 @@ fn install_windows(name: String, link: String) {
     }
 }
 
-fn install_linux(name: String, link: String) {
+#[cfg(target_os = "linux")]
+fn install_util(name: String, link: String) {
     match check_jdk_exists(&name) {
         false => {
             create_java_dir(&name);
@@ -118,11 +112,7 @@ pub fn install(name: String) {
     let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
     match res {
         Ok(x) => {
-            if *SYSTEM_OS == "linux".to_string() {
-                install_linux(name, x);
-            } else if *SYSTEM_OS == "windows".to_string() {
-                install_windows(name, x);
-            }
+            install_util(name, x);
         }
         Err(e) => {
             println!("{} ", e.to_string());
