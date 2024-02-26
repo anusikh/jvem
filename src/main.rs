@@ -7,47 +7,51 @@ use crate::commands::{
     uninstall::uninstall, usev::usev,
 };
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
 struct Cli {
-    arg_type: String,
-    arg: Option<String>,
+    #[clap(subcommand)]
+    cmd: Command,
+}
+
+#[derive(Parser, Debug)]
+enum Command {
+    #[clap(about)]
+    Install(Arg),
+    Uninstall(Arg),
+    Usev(Arg),
+    Current,
+    Lsrem,
+    Ls,
+    Deactivate,
+}
+
+#[derive(Parser, Debug)]
+struct Arg {
+    #[clap(index = 1)]
+    arg: String,
 }
 
 #[tokio::main]
 async fn main() {
-    let args = Cli::parse();
-
-    println!("pattern: {:?}, path: {:?}", args.arg_type, args.arg);
-
-    let _ = match args.arg_type.as_str() {
-        "lsrem" => lsrem(),
-        "install" => Ok(match args.arg {
-            Some(x) => {
-                install(x);
-            }
-            None => {
-                println!("please mention a jdk");
-            }
-        }),
-        "ls" => Ok(ls()),
-        "usev" => Ok(match args.arg {
-            Some(x) => {
-                let _ = usev(x).await;
-            }
-            None => {
-                println!("please mention a jdk");
-            }
-        }),
-        "deactivate" => Ok(deactivate()),
-        "current" => Ok(current()),
-        "uninstall" => Ok(match args.arg {
-            Some(x) => {
-                let _ = uninstall(x);
-            }
-            None => {
-                println!("please mention a jdk");
-            }
-        }),
-        _ => todo!(),
-    };
+    match Cli::parse().cmd {
+        Command::Install(arg) => {
+            let jdk = arg.arg;
+            install(jdk);
+        }
+        Command::Current => current(),
+        Command::Uninstall(arg) => {
+            let jdk = arg.arg;
+            uninstall(jdk);
+        }
+        Command::Usev(arg) => {
+            let jdk = arg.arg;
+            usev(jdk).await;
+        }
+        Command::Lsrem => {
+            let _ = lsrem();
+        }
+        Command::Ls => ls(),
+        Command::Deactivate => deactivate(),
+    }
 }

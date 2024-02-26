@@ -4,6 +4,7 @@ a java version manager
 
 - cargo run -- install zulu21
 - cargo run -- lsrem
+- cargo run -- ls
 - cargo run -- usev zulu17
 - cargo run -- current
 - cargo run -- deactivate
@@ -26,7 +27,7 @@ TODO:
 - ~~uninstall~~
     - ~~linux~~ 
     - ~~windows~~ 
-- help
+- ~~help~~
 - test cases
 - signal interrupt handling
     - linux

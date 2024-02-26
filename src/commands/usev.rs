@@ -27,6 +27,8 @@ async fn usev_util(name: String) {
     });
 
     let alias_future = tokio::spawn(async move {
+        println!("creating symlink...");
+
         // remove the previously linked folder
         let _ = run_command(
             "powershell",
@@ -43,7 +45,7 @@ async fn usev_util(name: String) {
             ],
         );
         if output.status.success() {
-            println!("set jdk version successfully");
+            println!("done!");
         } else {
             println!("failed: {}", String::from_utf8_lossy(&output.stderr));
         }
@@ -51,7 +53,7 @@ async fn usev_util(name: String) {
 
     let _ = tokio::join!(alias_future, java_home_future);
 
-    println!("reopen powershell for changes to be reflected");
+    println!("set jdk version successfully");
 }
 
 #[cfg(target_os = "linux")]
