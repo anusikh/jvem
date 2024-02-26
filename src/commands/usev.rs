@@ -1,4 +1,4 @@
-use super::utils::{check_jdk_exists, get_installation_dir, run_command};
+use crate::utils::file_utils::{check_jdk_exists, get_home_dir, get_installation_dir, run_command};
 
 #[cfg(target_os = "windows")]
 async fn usev_util(name: String) {
@@ -58,8 +58,6 @@ async fn usev_util(name: String) {
 
 #[cfg(target_os = "linux")]
 pub async fn usev_util(name: String) {
-    use super::utils::get_home_dir;
-
     // remove the previously linked folder
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 

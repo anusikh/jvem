@@ -1,4 +1,4 @@
-use super::utils::{get_home_dir, run_command};
+use crate::utils::file_utils::{get_home_dir, run_command};
 
 #[cfg(target_os = "windows")]
 fn deactivate_util() {

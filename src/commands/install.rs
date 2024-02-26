@@ -1,8 +1,8 @@
 use std::error::Error;
 
-use crate::commands::csv_ops::get_download_link;
+use crate::utils::csv_ops::get_download_link;
 
-use super::utils::{
+use crate::utils::file_utils::{
     check_jdk_exists, create_java_dir, find_file_in_dir, get_home_dir, get_installation_dir,
     run_command,
 };
@@ -76,7 +76,7 @@ fn install_util(name: String, link: String) {
                 let tarball_status = run_command(
                     "/usr/bin/tar",
                     vec![
-                        "xzf",
+                        "xvzf",
                         &find_file_in_dir("/tmp/", &name),
                         "--strip-components=1",
                         "-C",

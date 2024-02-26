@@ -1,4 +1,4 @@
-use super::utils::{get_installation_dir, run_command};
+use crate::utils::file_utils::{get_installation_dir, run_command};
 
 #[cfg(target_os = "windows")]
 fn uninstall_util(name: &str) {

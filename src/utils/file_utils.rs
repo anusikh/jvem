@@ -1,7 +1,5 @@
 use std::{
-    env,
-    fmt::format,
-    fs, io,
+    env, fs, io,
     path::Path,
     process::{Command, Output},
 };

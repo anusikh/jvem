@@ -11,7 +11,7 @@ struct Record {
 }
 
 pub fn read_csv() -> Result<(), Box<dyn Error>> {
-    let mut reader = csv::Reader::from_path("src/commands/sources.csv").unwrap();
+    let mut reader = csv::Reader::from_path("src/utils/sources.csv").unwrap();
 
     for record in reader.deserialize() {
         let record: Record = record?;
@@ -22,7 +22,7 @@ pub fn read_csv() -> Result<(), Box<dyn Error>> {
 }
 
 pub fn get_download_link(name: String, os: &str) -> Result<String, Box<dyn Error>> {
-    let mut reader = csv::Reader::from_path("src/commands/sources.csv").unwrap();
+    let mut reader = csv::Reader::from_path("src/utils/sources.csv").unwrap();
     let mut res = "".to_string();
     for record in reader.deserialize() {
         let record: Record = record?;
