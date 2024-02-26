@@ -4,10 +4,13 @@ a java version manager
 
 - cargo run -- install zulu21
 - cargo run -- lsrem
+- cargo run -- ls
 - cargo run -- usev zulu17
 - cargo run -- current
 - cargo run -- deactivate
 - cargo run -- uninstall zulu17
+- cargo run -- help
+- cargo run -- clean
 
 TODO:
 - ~~lsrem~~
@@ -26,11 +29,11 @@ TODO:
 - ~~uninstall~~
     - ~~linux~~ 
     - ~~windows~~ 
-- help
+- ~~help~~
+- ~~signal interrupt handling~~
+    - ~~linux~~
+    - ~~windows~~
 - test cases
-- signal interrupt handling
-    - linux
-    - windows
 - publishing pipeline
 - installation script 
     - linux (make sure you add export PATH=$PATH:/home/anusikh/.jvem/java/bin in .bashrc and source it)

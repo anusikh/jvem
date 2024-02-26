@@ -33,13 +33,13 @@ pub fn get_download_link(name: String, os: &str) -> Result<String, Box<dyn Error
                 res = record.windows;
             } else if os == "macos" {
                 res = record.macos;
-            } 
+            }
         }
     }
 
     if res == "".to_string() {
         Err("couldn't recogonize os or the specified jdk is not available".into())
-    }else {
+    } else {
         Ok(res)
     }
 }
