@@ -13,29 +13,33 @@ a java version manager
 - cargo run -- clean
 
 TODO:
+
 - ~~lsrem~~
 - ~~install~~
-    - ~~linux~~ 
-    - ~~windows~~
+  - ~~linux~~
+  - ~~windows~~
 - ~~ls (list all locally installed versions)~~
 - ~~improve command line outputs~~
 - ~~usev (will be done using symlinks)~~
-    - ~~linux~~ 
-    - ~~windows~~ 
+  - ~~linux~~
+  - ~~windows~~
 - ~~deactivate~~
-    - ~~linux~~ 
-    - ~~windows~~ 
+  - ~~linux~~
+  - ~~windows~~
 - ~~current~~
 - ~~uninstall~~
-    - ~~linux~~ 
-    - ~~windows~~ 
+  - ~~linux~~
+  - ~~windows~~
 - ~~help~~
 - ~~signal interrupt handling~~
-    - ~~linux~~
-    - ~~windows~~
+  - ~~linux~~
+  - ~~windows~~
+- fetch zip/tar from cache directly
+  - ~~linux~~
+  - windows
 - test cases
 - publishing pipeline
-- installation script 
-    - linux (make sure you add export PATH=$PATH:/home/anusikh/.jvem/java/bin in .bashrc and source it)
-    - windows (make sure you add this to Path env: C:\Users\anusi\.jvem\java\bin)
+- installation script
+  - linux (make sure you add export PATH=$PATH:/home/anusikh/.jvem/java/bin in .bashrc and source it)
+  - windows (make sure you add this to Path env: C:\Users\anusi\.jvem\java\bin)
 - bug fixes

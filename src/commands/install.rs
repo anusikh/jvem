@@ -3,8 +3,8 @@ use std::error::Error;
 use crate::utils::csv_ops::get_download_link;
 
 use crate::utils::file_utils::{
-    check_jdk_exists, create_java_dir, find_file_in_dir, get_home_dir, get_installation_dir,
-    run_command,
+    check_jdk_exists, create_java_dir, extract_tarball, find_file_in_dir, get_home_dir,
+    get_installation_dir, run_command,
 };
 
 #[cfg(target_os = "windows")]
@@ -67,33 +67,22 @@ fn install_util(name: String, link: String) {
 fn install_util(name: String, link: String) {
     match check_jdk_exists(&name) {
         false => {
+            let x = find_file_in_dir("/tmp/", &name);
+
             create_java_dir(&name);
 
-            let output = run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
-            if output.status.success() {
-                println!("fetching tarball successful ");
-
-                let tarball_status = run_command(
-                    "/usr/bin/tar",
-                    vec![
-                        "xvzf",
-                        &find_file_in_dir("/tmp/", &name),
-                        "--strip-components=1",
-                        "-C",
-                        &format!("{}/.jvem/{}", get_home_dir(), name),
-                    ],
-                );
-
-                if tarball_status.status.success() {
-                    println!("tarball extraction successful ");
-                } else {
-                    println!(
-                        "tarball extraction failed: {:?} ",
-                        String::from_utf8_lossy(&tarball_status.stderr)
-                    );
-                }
+            if x.ends_with(".gz") {
+                println!("fetching tarball from cache successful");
+                extract_tarball(name);
             } else {
-                println!("fetching tarball failed ");
+                let output =
+                    run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
+                if output.status.success() {
+                    println!("fetching tarball successful ");
+                    extract_tarball(name);
+                } else {
+                    println!("fetching tarball failed ");
+                }
             }
         }
         true => {
