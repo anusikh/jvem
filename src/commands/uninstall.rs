@@ -10,12 +10,9 @@ fn uninstall_util(name: &str) {
         ],
     );
     if output.status.success() {
-        println!("uninstall successful ");
+        println!("uninstall successful");
     } else {
-        println!(
-            "uninstall failed: {} ",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
     }
 }
 
@@ -28,10 +25,7 @@ fn uninstall_util(name: &str) {
     if output.status.success() {
         println!("uninstall successful ");
     } else {
-        println!(
-            "uninstall failed: {} ",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
     }
 }
 

@@ -22,10 +22,7 @@ fn deactivate_util() {
     if output.status.success() {
         println!("deactivation successful ");
     } else {
-        println!(
-            "deactivation failed: {} ",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        println!("deactivation failed");
     }
 }
 

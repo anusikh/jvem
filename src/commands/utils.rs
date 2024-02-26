@@ -1,5 +1,7 @@
 use std::{
-    env, fs,
+    env,
+    fmt::format,
+    fs, io,
     path::Path,
     process::{Command, Output},
 };
@@ -78,6 +80,21 @@ pub fn check_list_locally() {
         }
         false => {
             println!("{}", "no jdk installations found locally");
+        }
+    }
+}
+
+fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
+    Ok(fs::read_dir(path)?.next().is_none())
+}
+
+pub fn clean_jvem() {
+    for entry in fs::read_dir(format!("{}/.jvem", get_home_dir())).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.is_dir() && is_empty_dir(&path).unwrap() {
+            fs::remove_dir(&path).unwrap();
         }
     }
 }

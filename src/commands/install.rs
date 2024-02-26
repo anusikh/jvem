@@ -58,7 +58,7 @@ fn install_util(name: String, link: String) {
             }
         }
         true => {
-            println!("jdk already exists in fs ");
+            println!("jdk already exists in fs, if it doesn't run the clean command");
         }
     }
 }
@@ -97,18 +97,12 @@ fn install_util(name: String, link: String) {
             }
         }
         true => {
-            println!("jdk already exists in fs ");
+            println!("jdk already exists in fs, if it doesn't run the clean command");
         }
     }
 }
 
 pub fn install(name: String) {
-    println!(
-        "triggered install with param {} {} ",
-        name,
-        std::env::consts::OS
-    );
-
     let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
     match res {
         Ok(x) => {
