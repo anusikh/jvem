@@ -1,14 +1,15 @@
-## jvem
+## jvem (WIP)
 
 ### about
+
 a java version manager for windows and linux
 
 ```
 # or zulu17 or zulu11 or zulu8
-jvem install zulu21 
+jvem install zulu21
 
 # list all jdk's available for install
-jvem lsrem 
+jvem lsrem
 
 # locally installed
 jvem ls
@@ -36,19 +37,23 @@ jvem --V/--version
 ```
 
 ### installation
+
 for windows
+
 - download the .exe file from the [releases](https://github.com/anusikh/jvem/releases)
 - add this to path env variable: `C:\Users\<user>\.jvem\java\bin)`
 - also add the path to the downloaded .exe file in the path env variable: `C:\Users\<user>\Desktop\jvm.exe)`
 - replace user with the appropriate user folder name
 
 for linux
+
 - download the binary from [releases](https://github.com/anusikh/jvem/releases)
 - open .bashrc/.zshrc and paste this: `PATH=$PATH:$HOME/.jvem/java/bin`
 - also add this: `alias jvem=<path-to-jvem-binary>`
 - open the terminal and run: `source ~/.bashrc` or `source ~/.zshrc`
 
 ### todo
+
 - mac support
 - test cases
 - installation script
