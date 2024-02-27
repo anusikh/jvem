@@ -1,6 +1,6 @@
 ### jvem (WIP)
 
-a java version manager
+a java version manager for windows and linux
 
 - jvem install zulu21
 - jvem lsrem
