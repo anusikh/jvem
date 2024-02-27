@@ -118,3 +118,26 @@ pub fn extract_tarball(name: String) {
         );
     }
 }
+
+pub fn extract_zip(temp_dir: &str, name: &str) {
+    let unzip_output = run_command(
+        "powershell",
+        vec![
+            "-Command",
+            &format!(
+                "Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1}",
+                temp_dir,
+                get_installation_dir(name),
+            ),
+        ],
+    );
+
+    if unzip_output.status.success() {
+        println!("unzipping successful ");
+    } else {
+        println!(
+            "unzipping failed: {} ",
+            String::from_utf8_lossy(&unzip_output.stderr)
+        );
+    }
+}

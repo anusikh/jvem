@@ -3,8 +3,8 @@ use std::error::Error;
 use crate::utils::csv_ops::get_download_link;
 
 use crate::utils::file_utils::{
-    check_jdk_exists, create_java_dir, extract_tarball, find_file_in_dir, get_home_dir,
-    get_installation_dir, run_command,
+    check_jdk_exists, create_java_dir, extract_tarball, extract_zip, find_file_in_dir,
+    get_home_dir, get_installation_dir, run_command,
 };
 
 #[cfg(target_os = "windows")]
@@ -14,47 +14,34 @@ fn install_util(name: String, link: String) {
             create_java_dir(&name);
 
             let temp_directory = format!("{}/AppData/Local/Temp/{}.zip", get_home_dir(), name);
-            let output = run_command(
-                "powershell",
-                vec![
-                    "-Command",
-                    "Set-Variable ProgressPreference SilentlyContinue ;",
-                    "Invoke-WebRequest",
-                    "-outf",
-                    &temp_directory,
-                    "-Uri",
-                    &format!("{}", link),
-                ],
-            );
 
-            if output.status.success() {
-                println!("fetching zip successful ");
-
-                let unzip_output = run_command(
+            if std::path::Path::new(&temp_directory).exists() {
+                println!("fetching tarball from cache successful");
+                extract_zip(&temp_directory, &name);
+            } else {
+                println!("fetching zip...");
+                let output = run_command(
                     "powershell",
                     vec![
                         "-Command",
-                        &format!(
-                            "Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1}",
-                            &temp_directory,
-                            get_installation_dir(&name),
-                        ),
+                        "Set-Variable ProgressPreference SilentlyContinue ;",
+                        "Invoke-WebRequest",
+                        "-outf",
+                        &temp_directory,
+                        "-Uri",
+                        &format!("{}", link),
                     ],
                 );
 
-                if unzip_output.status.success() {
-                    println!("unzipping successful ");
+                if output.status.success() {
+                    println!("fetching zip successful ");
+                    extract_zip(&temp_directory, &name);
                 } else {
                     println!(
-                        "unzipping failed: {} ",
-                        String::from_utf8_lossy(&unzip_output.stderr)
+                        "fetching zip failed: {} ",
+                        String::from_utf8_lossy(&output.stderr)
                     );
                 }
-            } else {
-                println!(
-                    "fetching zip failed: {} ",
-                    String::from_utf8_lossy(&output.stderr)
-                );
             }
         }
         true => {
