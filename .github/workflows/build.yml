@@ -28,7 +28,7 @@ jobs:
           mv target/release/jvem target/release/jvem_amd64
 
           # make src/utils folder inside release folder
-          mkdir target/release/src/utils
+          mkdir -p target/release/src/utils
 
           # Copy sources.csv to the build directory
           cp src/utils/sources.csv target/release/src/utils
