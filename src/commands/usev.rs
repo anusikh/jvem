@@ -32,14 +32,15 @@ async fn usev_util(name: String) {
         // remove the previously linked folder
         let _ = run_command(
             "powershell",
-            vec!["-Command", &format!("rm -r \\Users\\anusi\\.jvem\\java")],
+            vec!["-Command", &format!("rm -r {}\\.jvem\\java", get_home_dir())],
         );
         let output = run_command(
             "powershell",
             vec![
                 "-Command",
                 &format!(
-                    "New-Item -Path C:\\Users\\anusi\\.jvem\\java -ItemType Junction -Value {}",
+                    "New-Item -Path {}\\.jvem\\java -ItemType Junction -Value {}",
+                    get_home_dir(),
                     java_path
                 ),
             ],
