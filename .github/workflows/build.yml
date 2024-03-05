@@ -60,7 +60,17 @@ jobs:
           override: true
 
       - name: build
-        run: cargo build --all --release
+        run: |
+          cargo build --all --release
+
+          # Create src/utils folder inside the release directory
+          mkdir target\release\src\utils
+
+          # Copy sources.csv to the build directory
+          copy src\utils\sources.csv target\release\src\utils\
+
+          # Create a zip file
+          Compress-Archive -Path target\release\* -DestinationPath jvem.zip
 
       - name: release
         uses: softprops/action-gh-release@v1
