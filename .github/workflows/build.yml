@@ -42,7 +42,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/release/jvem_amd64
+            jvem.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,6 +78,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: target/release/jvem.exe
+          files: jvem.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
