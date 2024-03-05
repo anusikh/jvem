@@ -22,7 +22,19 @@ jobs:
           override: true
 
       - name: build
-        run: cargo build --all --release && strip target/release/jvem && mv target/release/jvem target/release/jvem_amd64
+        run: |
+          cargo build --all --release 
+          strip target/release/jvem 
+          mv target/release/jvem target/release/jvem_amd64
+
+          # make src/utils folder inside release folder
+          mkdir target/release/src/utils
+
+          # Copy sources.csv to the build directory
+          cp src/utils/sources.csv target/release/src/utils
+
+          # Create a tarball
+          tar -czvf jvem.tar.gz -C target/release/ jvem
 
       - name: release
         uses: softprops/action-gh-release@v1
