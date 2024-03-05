@@ -23,8 +23,7 @@ jobs:
 
       - name: build
         run: |
-          cargo build --all --release 
-          strip target/release/jvem 
+          cargo build --all --release
           mv target/release/jvem target/release/jvem_amd64
 
           # make src/utils folder inside release folder
@@ -34,7 +33,7 @@ jobs:
           cp src/utils/sources.csv target/release/src/utils
 
           # Create a tarball
-          tar -czvf jvem.tar.gz -C target/release/ jvem
+          tar -czvf jvem.tar.gz -C target/release/ jvem_amd64
 
       - name: release
         uses: softprops/action-gh-release@v1
