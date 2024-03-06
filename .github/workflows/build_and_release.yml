@@ -38,7 +38,7 @@ jobs:
         run: |
           cargo build --all --release
           mv target/release/jvem target/release/jvem_amd64        
-          tar -czvf ${{ env.LINUX_ARTIFACT }} -C target/release/ jvem_amd64
+          tar -czvf ${{ env.LINUX_ARTIFACT }} -C target/release/ .
 
   build-win:
     needs: common-build
