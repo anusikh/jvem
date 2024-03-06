@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::utils::csv_ops::get_download_link;
+use crate::utils::env_ops::get_download_link;
 
 use crate::utils::file_utils::{
     check_jdk_exists, create_java_dir, extract_tarball, extract_zip, find_file_in_dir,
