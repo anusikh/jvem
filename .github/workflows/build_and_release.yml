@@ -16,7 +16,10 @@ jobs:
   common-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: jvem
       - name: tests
         run: cargo test --verbose
       - name: install latest rust toolchain
@@ -30,6 +33,10 @@ jobs:
     needs: common-build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: jvem
       - name: build
         run: |
           cargo build --all --release
@@ -42,6 +49,10 @@ jobs:
     needs: common-build
     runs-on: windows-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: jvem
       - name: build
         run: |
           cargo build --all --release
