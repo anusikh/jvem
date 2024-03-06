@@ -38,9 +38,13 @@ jobs:
         run: |
           cargo build --all --release
           mv target/release/jvem target/release/jvem_amd64
-          cp .env target/release/
 
-          tar -czvf ${{ env.LINUX_ARTIFACT }} -C target/release/ jvem_amd64
+          # make a release folder
+          mkdir source
+          copy .env source/
+          copy target/release/jvem_amd64 source/
+
+          tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ jvem_amd64
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
