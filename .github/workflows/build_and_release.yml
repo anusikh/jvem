@@ -10,9 +10,9 @@ on:
     branches: [main]
 
 env:
-  LINUX_ARTIFACT: jvem.tar.gz
+  LINUX_ARTIFACT: jvem_linux.tar.gz
   WINDOWS_ARTIFACT: jvem.zip
-  MACOS_ARTIFACT: jvem.tar.gz
+  MACOS_ARTIFACT: jvem_macos.tar.gz
 
 jobs:
   common-build:
