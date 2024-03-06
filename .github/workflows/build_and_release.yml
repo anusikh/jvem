@@ -57,6 +57,10 @@ jobs:
           cargo build --all --release
           copy .env target\release\
           Compress-Archive -Path target\release\* -DestinationPath ${{ env.WINDOWS_ARTIFACT }}
+      - name: Execute jvem.exe with lsmem option
+        run: |
+          cd target\release
+          .\jvem.exe lsrem
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
