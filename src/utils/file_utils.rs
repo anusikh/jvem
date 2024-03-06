@@ -97,12 +97,36 @@ pub fn clean_jvem() {
     }
 }
 
+#[cfg(target_os = "linux")]
 pub fn extract_tarball(name: String) {
     let tarball_status = run_command(
         "/usr/bin/tar",
         vec![
             "xvzf",
             &find_file_in_dir("/tmp/", &name),
+            "--strip-components=1",
+            "-C",
+            &format!("{}/.jvem/{}", get_home_dir(), name),
+        ],
+    );
+
+    if tarball_status.status.success() {
+        println!("tarball extraction successful ");
+    } else {
+        println!(
+            "tarball extraction failed: {:?} ",
+            String::from_utf8_lossy(&tarball_status.stderr)
+        );
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn extract_tarball(temp_directory: &str, name: &str) {
+    let tarball_status = run_command(
+        "/usr/bin/tar",
+        vec![
+            "xvzf",
+            temp_directory,
             "--strip-components=1",
             "-C",
             &format!("{}/.jvem/{}", get_home_dir(), name),

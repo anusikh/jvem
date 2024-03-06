@@ -80,7 +80,30 @@ fn install_util(name: String, link: String) {
 
 #[cfg(target_os = "macos")]
 fn install_util(name: String, link: String) {
-    // Implement installation logic for macOS
+    create_java_dir(&name);
+
+    let temp_directory = format!("/tmp/{}.tar.gz", name);
+
+    if std::path::Path::new(&temp_directory).exists() {
+        println!("fetching tarball from cache successful");
+        extract_tarball(&temp_directory, &name);
+    } else {
+        println!("fetching tarball...");
+        let output = run_command(
+            "/usr/bin/curl",
+            vec!["-o", &temp_directory, &format!("{}", link)],
+        );
+
+        if output.status.success() {
+            println!("fetching tarball successful ");
+            extract_tarball(&temp_directory, &name);
+        } else {
+            println!(
+                "fetching tarball failed: {} ",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
 }
 
 pub fn install(name: String) {
