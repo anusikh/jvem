@@ -97,8 +97,7 @@ pub fn clean_jvem() {
     }
 }
 
-#[cfg(target_os = "linux")]
-pub fn extract_tarball(name: String) {
+pub fn extract_tarball_linux(name: String) {
     let tarball_status = run_command(
         "/usr/bin/tar",
         vec![
@@ -120,8 +119,7 @@ pub fn extract_tarball(name: String) {
     }
 }
 
-#[cfg(target_os = "macos")]
-pub fn extract_tarball(temp_directory: &str, name: &str) {
+pub fn extract_tarball_macos(temp_directory: &str, name: &str) {
     let tarball_status = run_command(
         "/usr/bin/tar",
         vec![
