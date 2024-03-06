@@ -73,6 +73,7 @@ async fn main() {
     // the below logic is used for ctrl+c handling
     // the idea here is to set a boolean atomic value, when program is running
     // on ctrl+c, the value is set to false and it stops the process
+    dotenv::dotenv().ok();
 
     let running = Arc::new(AtomicBool::new(true));
     let running_clone = Arc::clone(&running);
