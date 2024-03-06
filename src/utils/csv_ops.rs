@@ -1,45 +1,27 @@
 use std::error::Error;
 
-use serde::Deserialize;
+fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
+    if let Ok(available_versions) = std::env::var("AVAILABLE_VERSIONS") {
+        let versions: Vec<&str> = available_versions.split(',').collect();
 
-#[derive(Debug, Deserialize)]
-struct Record {
-    name: String,
-    linux: String,
-    windows: String,
-    macos: String,
-}
-
-pub fn read_csv() -> Result<(), Box<dyn Error>> {
-    let mut reader = csv::Reader::from_path("src/utils/sources.csv").unwrap();
-
-    for record in reader.deserialize() {
-        let record: Record = record?;
-        println!("{}", record.name);
+        for version in versions {
+            if let Ok(_) = std::env::var(&version) {
+                println!("{}", version);
+            }
+        }
     }
 
     Ok(())
 }
 
 pub fn get_download_link(name: String, os: &str) -> Result<String, Box<dyn Error>> {
-    let mut reader = csv::Reader::from_path("src/utils/sources.csv").unwrap();
-    let mut res = "".to_string();
-    for record in reader.deserialize() {
-        let record: Record = record?;
-        if name == record.name {
-            if os == "linux" {
-                res = record.linux;
-            } else if os == "windows" {
-                res = record.windows;
-            } else if os == "macos" {
-                res = record.macos;
-            }
-        }
-    }
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
 
-    if res == "".to_string() {
-        Err("couldn't recogonize os or the specified jdk is not available".into())
-    } else {
-        Ok(res)
+    // Access the environment variable for the specified name
+    let env_var_name = format!("{}_{}", name, os.to_uppercase());
+    match env::var(&env_var_name) {
+        Ok(value) => Ok(value),
+        Err(_) => Err("Couldn't recognize OS or the specified JDK is not available".into()),
     }
 }

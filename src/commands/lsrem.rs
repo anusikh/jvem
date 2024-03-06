@@ -1,7 +1,8 @@
 use std::error::Error;
 
-use crate::utils::csv_ops::read_csv;
+use crate::utils::csv_ops::read_versions;
 
 pub fn lsrem() -> Result<(), Box<dyn Error>> {
-    read_csv()
+    read_versions()?;
+    Ok(())
 }
