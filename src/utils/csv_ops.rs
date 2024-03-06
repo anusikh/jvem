@@ -8,9 +8,7 @@ pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
         let versions: Vec<&str> = available_versions.split(',').collect();
 
         for version in versions {
-            if let Ok(_) = std::env::var(&version) {
-                println!("{}", version);
-            }
+            println!("{}", version);
         }
     }
 
