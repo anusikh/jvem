@@ -84,7 +84,8 @@ fn install_util(name: String, link: String) {
 }
 
 pub fn install(name: String) {
-    let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
+    let res: Result<String, Box<dyn Error>> =
+        get_download_link(name.clone(), std::env::consts::OS, std::env::consts::ARCH);
     match res {
         Ok(x) => {
             install_util(name, x);

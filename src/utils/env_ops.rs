@@ -12,8 +12,20 @@ pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn get_download_link(name: String, os: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let env_var_name = format!("{}_{}", name.to_uppercase(), os.to_uppercase());
+pub fn get_download_link(
+    name: String,
+    os: &str,
+    arch: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let mut env_var_name = format!("{}_{}", name.to_uppercase(), os.to_uppercase());
+    if os == "macos" {
+        env_var_name = format!(
+            "{}_{}_{}",
+            name.to_uppercase(),
+            os.to_uppercase(),
+            arch.to_uppercase()
+        );
+    }
     if let Some(value) = constants::get_constant(&env_var_name) {
         Ok(value.to_string())
     } else {
