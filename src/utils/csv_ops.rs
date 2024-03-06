@@ -20,7 +20,7 @@ pub fn get_download_link(name: String, os: &str) -> Result<String, Box<dyn Error
     dotenv::dotenv().ok();
 
     // Access the environment variable for the specified name
-    let env_var_name = format!("{}_{}", name, os.to_uppercase());
+    let env_var_name = format!("{}_{}", name.to_uppercase(), os.to_uppercase());
     match std::env::var(&env_var_name) {
         Ok(value) => Ok(value),
         Err(_) => Err("Couldn't recognize OS or the specified JDK is not available".into()),
