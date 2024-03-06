@@ -41,10 +41,10 @@ jobs:
 
           # make a release folder
           mkdir source
-          cp .env source/
-          cp target/release/jvem_amd64 source/
+          mv .env source/
+          mv target/release/jvem_amd64 source/
 
-          tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ jvem_amd64
+          tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ .
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
