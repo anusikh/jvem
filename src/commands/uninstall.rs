@@ -29,6 +29,21 @@ fn uninstall_util(name: &str) {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn uninstall_util(name: &str) {
+    // ToDo
+
+    let output = run_command(
+        "rm",
+        vec!["-rf", &format!("{}", get_installation_dir(&name))],
+    );
+    if output.status.success() {
+        println!("uninstall successful ");
+    } else {
+        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
+    }
+}
+
 pub fn uninstall(name: String) {
     let _ = uninstall_util(&name);
 }

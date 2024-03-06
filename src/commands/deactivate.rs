@@ -26,6 +26,16 @@ fn deactivate_util() {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn deactivate_util() {
+    let output = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
+    if output.status.success() {
+        println!("deactivation successful");
+    } else {
+        println!("deactivation failed");
+    }
+}
+
 pub fn deactivate() {
     let _ = deactivate_util();
 }

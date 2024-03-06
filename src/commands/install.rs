@@ -78,6 +78,11 @@ fn install_util(name: String, link: String) {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn install_util(name: String, link: String) {
+    // Implement installation logic for macOS
+}
+
 pub fn install(name: String) {
     let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
     match res {
