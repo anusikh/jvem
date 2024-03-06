@@ -41,8 +41,8 @@ jobs:
 
           # make a release folder
           mkdir source
-          copy .env source/
-          copy target/release/jvem_amd64 source/
+          cp .env source/
+          cp target/release/jvem_amd64 source/
 
           tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ jvem_amd64
       - name: Upload Artifact
