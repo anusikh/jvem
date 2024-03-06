@@ -38,6 +38,7 @@ jobs:
       - name: build
         run: |
           cargo build --all --release
+          mv target/release/jvem target/release/jvem_amd64
           mkdir source
           mv target/release/jvem_amd64 source/
           tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ .
