@@ -1,7 +1,10 @@
 use std::error::Error;
 
 fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
-    if let Ok(available_versions) = std::env::var("AVAILABLE_VERSIONS") {
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
+
+    if let Ok(available_versions) = env::var("AVAILABLE_VERSIONS") {
         let versions: Vec<&str> = available_versions.split(',').collect();
 
         for version in versions {
