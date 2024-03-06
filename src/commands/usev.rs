@@ -32,7 +32,10 @@ async fn usev_util(name: String) {
         // remove the previously linked folder
         let _ = run_command(
             "powershell",
-            vec!["-Command", &format!("rm -r {}\\.jvem\\java", get_home_dir())],
+            vec![
+                "-Command",
+                &format!("rm -r {}\\.jvem\\java", get_home_dir()),
+            ],
         );
         let output = run_command(
             "powershell",
@@ -60,6 +63,30 @@ async fn usev_util(name: String) {
 #[cfg(target_os = "linux")]
 pub async fn usev_util(name: String) {
     // remove the previously linked folder
+    let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
+
+    let output = run_command(
+        "sh",
+        vec![
+            "-c",
+            &format!(
+                "ln --symbolic {} {}/.jvem/java",
+                get_installation_dir(&name),
+                get_home_dir()
+            ),
+        ],
+    );
+
+    if output.status.success() {
+        println!("set jdk version successfully");
+    } else {
+        println!("failed: {}", String::from_utf8_lossy(&output.stderr))
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub async fn usev_util(name: String) {
+    // ToDo
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 
     let output = run_command(
