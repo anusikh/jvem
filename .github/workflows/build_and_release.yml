@@ -41,7 +41,6 @@ jobs:
 
           # make a release folder
           mkdir source
-          mv .env source/
           mv target/release/jvem_amd64 source/
 
           tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ .
@@ -63,7 +62,6 @@ jobs:
 
           # make a release folder
           mkdir source
-          copy .env source/
           copy target\release\jvem.exe source/
 
           Compress-Archive -Path source\* -DestinationPath ${{ env.WINDOWS_ARTIFACT }}
