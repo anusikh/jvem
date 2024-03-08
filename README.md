@@ -57,8 +57,29 @@ To get started with JVeM, refer to the installation instructions and basic usage
 ## Usage:
 
 Once installed, use the following commands to manage your Java versions.
+1. Check all versions of java supported by JVeM:
+```
+jvem lsrem
+```
+2. Install a new version on your system:
+```
+jvem install zulu17
+```
+3. Start using the java version installed
+```
+jvem usev zulu17
+```
+4. Check if java got installed:
 
-#### Commands and Descriptions
+   If java versions < 8:
+`java -version `
+   else:
+`java --version`
+5. Uninstall java
+`jvem uninstall zulu17`
+
+
+## Commands and Descriptions
 
 | Command                        | Description                                    |
 | ------------------------------ | ---------------------------------------------- |
@@ -83,3 +104,9 @@ JVeM is an evolving project, and future updates may include:
 - Bug fixes and improvements based on user feedback.
 
 Explore the full capabilities of JVeM to enhance your Java development experience!
+
+
+
+### Note for MacOs:
+This might show an error when trying to use it for the first time, you would need to allow it from settings > under privacy and security:
+<img width="710" alt="Screenshot 2024-03-09 at 2 14 49 AM" src="https://github.com/anusikh/jvem/assets/64547846/0f37ea90-1b68-4272-a823-f8dd2390c324">
