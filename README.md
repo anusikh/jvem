@@ -1,62 +1,72 @@
-## jvem
+# Java Version Manager (JVeM)
 
-### about
+Java Version Manager (JVeM) is a cross-platform tool designed to simplify the management of multiple Java versions on your system. Whether you're a developer working on diverse projects or an enthusiast exploring different Java applications, JVeM makes it easy to switch between and manage various Java versions seamlessly.
 
-a java version manager for windows and linux
+## Table of Contents
+1. [Features](#features)
+2. [Supported Platforms](#supported-platforms)
+3. [Getting Started](#getting-started)
+    - [Windows Installation](#windows-installation)
+    - [macOS Installation](#macos-installation)
+    - [Linux Installation](#linux-installation)
+4. [Usage](#usage)
+    - [Commands and Descriptions](#commands-and-descriptions)
+5. [Future Scope](#future-scope)
 
-```
-# or zulu17 or zulu11 or zulu8
-jvem install zulu21
+## Features:
+- **Cross-Platform Support:** JVeM is compatible with macOS, Linux, and Windows, providing a consistent experience across different operating systems.
+- **Simple Version Switching:** Easily switch between different Java versions with a single command, streamlining your development workflow.
+- **Effortless Installation:** JVeM offers a straightforward installation process on supported platforms, ensuring quick setup without unnecessary complications.
+- **Customizable Configuration:** Tailor JVeM to your specific needs by configuring environment variables and settings to suit your Java development environment.
 
-# list all jdk's available for install
-jvem lsrem
+## Supported Platforms:
+- Windows
+- Linux
+- macOS
 
-# locally installed
-jvem ls
+## Getting Started:
+To get started with JVeM, refer to the installation instructions and basic usage guidelines below.
 
-# use a specific jdk version after install
-jvem usev zulu17
+#### Windows Installation
+- Download the latest `jvem.zip` file from [Releases](https://github.com/anusikh/jvem/releases)
+- Extract this file here.
+- Add this path to your environment variables: `C:\Users\<user>\.jvem\java\bin`
+- Add the path of the extracted folder to environment variables.
 
-# find the current jdk being used
-jvem current
+#### macOS Installation
+- Download the latest `jvem_macos.tar.gz` file from [Releases](https://github.com/anusikh/jvem/releases)
+- Extract the tarball file.
+- Add this line to your zshrc/bashrc file: `export JAVA_HOME=$HOME/.jvem/java` and source it.
+- Add an alias to use jvem easily. `alias jvem=~/Downloads/jvem`
 
-# deactivate current jdk
-jvem deactivate
+#### Linux Installation
+- Download the latest `jvem_linux.tar.gz` file from [Releases](https://github.com/anusikh/jvem/releases)
+- Extract the tarball file.
+- Add this line to your zshrc/bashrc file: `PATH=$PATH:$HOME/.jvem/java/bin` and source it.
+- Add an alias to use jvem easily. `alias jvem=~/Downloads/jvem`
 
-# uninstall a jdk
-jvem uninstall zulu17
+## Usage:
+Once installed, use the following commands to manage your Java versions.
 
-# help
-jvem help
+#### Commands and Descriptions
+| Command                           | Description                                   |
+|-----------------------------------|-----------------------------------------------|
+| `jvem lsrem`                      | List all JDK versions available for install.  |
+| `jvem ls`                         | List locally installed JDK versions.          |
+| `jvem install zulu21`             | Install Zulu JDK version 21.                 |
+| `jvem usev zulu17`                | Use a specific JDK version after installation.|
+| `jvem current`                    | Find the currently active JDK version.        |
+| `jvem deactivate`                 | Deactivate the currently active JDK.          |
+| `jvem uninstall zulu17`           | Uninstall the specified JDK version.          |
+| `jvem help`                       | Display help information.                     |
+| `jvem clean`                      | Clean empty folders in the .jvem directory.   |
+| `jvem --V` or `jvem --version`   | Display the version of JVeM.                  |
 
-# clean empty folders in .jvem directory
-jvem clean
+## Future Scope:
+JVeM is an evolving project, and future updates may include:
+- Addition of more JDKs
+- Addition of support for new platforms.
+- Integration of test cases to enhance stability.
+- Bug fixes and improvements based on user feedback.
 
-# version
-jvem --V/--version
-```
-
-### installation
-
-for windows
-
-- download the .exe file from the [releases](https://github.com/anusikh/jvem/releases)
-- add this to path env variable: `C:\Users\<user>\.jvem\java\bin)`
-- also add the path to the downloaded .exe file in the path env variable: `C:\Users\<user>\Desktop\jvm.exe)`
-- replace user with the appropriate user folder name
-
-for linux
-
-- download the binary from [releases](https://github.com/anusikh/jvem/releases)
-- open .bashrc/.zshrc and paste this: `PATH=$PATH:$HOME/.jvem/java/bin`
-- also add this: `alias jvem=<path-to-jvem-binary>`
-- open the terminal and run: `source ~/.bashrc` or `source ~/.zshrc`
-
-### todo
-
-- mac support
-- test cases
-- installation script
-  - linux (make sure you add export PATH=$PATH:/home/anusikh/.jvem/java/bin in .bashrc and source it)
-  - windows (make sure you add this to Path env: C:\Users\anusi\.jvem\java\bin)
-- bug fixes
+Explore the full capabilities of JVeM to enhance your Java development experience!
