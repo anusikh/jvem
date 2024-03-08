@@ -10,8 +10,9 @@ on:
     branches: [main]
 
 env:
-  LINUX_ARTIFACT: jvem.tar.gz
+  LINUX_ARTIFACT: jvem_linux.tar.gz
   WINDOWS_ARTIFACT: jvem.zip
+  MACOS_ARTIFACT: jvem_macos.tar.gz
 
 jobs:
   common-build:
@@ -38,11 +39,8 @@ jobs:
         run: |
           cargo build --all --release
           mv target/release/jvem target/release/jvem_amd64
-
-          # make a release folder
           mkdir source
           mv target/release/jvem_amd64 source/
-
           tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ .
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -59,11 +57,8 @@ jobs:
       - name: build
         run: |
           cargo build --all --release
-
-          # make a release folder
           mkdir source
           copy target\release\jvem.exe source/
-
           Compress-Archive -Path source\* -DestinationPath ${{ env.WINDOWS_ARTIFACT }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -71,21 +66,44 @@ jobs:
           name: windows-artifact
           path: ${{ env.WINDOWS_ARTIFACT }}
 
+  build-macos:
+    needs: common-build
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: build
+        run: |
+          cargo build --all --release
+          mkdir source
+          mv target/release/jvem source/
+          tar -czvf ${{ env.MACOS_ARTIFACT }} -C source/ .
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-artifact
+          path: ${{ env.MACOS_ARTIFACT }}
+
   release:
-    needs: [build-linux, build-win]
+    needs: [build-linux, build-win, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Download Artifacts
+      - name: Download Linux Artifact
         uses: actions/download-artifact@v2
         with:
           name: linux-artifact
           path: .
-      - name: Download Artifacts
+      - name: Download Windows Artifact
         uses: actions/download-artifact@v2
         with:
           name: windows-artifact
+          path: .
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-artifact
           path: .
       - name: release
         uses: softprops/action-gh-release@v1
@@ -94,5 +112,6 @@ jobs:
           files: |
             ${{ env.LINUX_ARTIFACT }}
             ${{ env.WINDOWS_ARTIFACT }}
+            ${{ env.MACOS_ARTIFACT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

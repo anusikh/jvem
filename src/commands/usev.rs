@@ -86,7 +86,6 @@ pub async fn usev_util(name: String) {
 
 #[cfg(target_os = "macos")]
 pub async fn usev_util(name: String) {
-    // ToDo
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 
     let output = run_command(
@@ -94,7 +93,7 @@ pub async fn usev_util(name: String) {
         vec![
             "-c",
             &format!(
-                "ln --symbolic {} {}/.jvem/java",
+                "ln -s {} {}/.jvem/java",
                 get_installation_dir(&name),
                 get_home_dir()
             ),

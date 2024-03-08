@@ -3,8 +3,8 @@ use std::error::Error;
 use crate::utils::env_ops::get_download_link;
 
 use crate::utils::file_utils::{
-    check_jdk_exists, create_java_dir, extract_tarball, extract_zip, find_file_in_dir,
-    get_home_dir, get_installation_dir, run_command,
+    check_jdk_exists, create_java_dir, extract_tarball_linux, extract_tarball_macos, extract_zip,
+    find_file_in_dir, get_home_dir, get_installation_dir, run_command,
 };
 
 #[cfg(target_os = "windows")]
@@ -60,13 +60,13 @@ fn install_util(name: String, link: String) {
 
             if x.ends_with(".gz") {
                 println!("fetching tarball from cache successful");
-                extract_tarball(name);
+                extract_tarball_linux(name);
             } else {
                 let output =
                     run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
                 if output.status.success() {
                     println!("fetching tarball successful ");
-                    extract_tarball(name);
+                    extract_tarball_linux(name);
                 } else {
                     println!("fetching tarball failed ");
                 }
@@ -80,11 +80,35 @@ fn install_util(name: String, link: String) {
 
 #[cfg(target_os = "macos")]
 fn install_util(name: String, link: String) {
-    // Implement installation logic for macOS
+    create_java_dir(&name);
+
+    let temp_directory = format!("/tmp/{}.tar.gz", name);
+
+    if std::path::Path::new(&temp_directory).exists() {
+        println!("fetching tarball from cache successful");
+        extract_tarball_macos(&temp_directory, &name);
+    } else {
+        println!("fetching tarball...");
+        let output = run_command(
+            "/usr/bin/curl",
+            vec!["-o", &temp_directory, &format!("{}", link)],
+        );
+
+        if output.status.success() {
+            println!("fetching tarball successful ");
+            extract_tarball_macos(&temp_directory, &name);
+        } else {
+            println!(
+                "fetching tarball failed: {} ",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
 }
 
 pub fn install(name: String) {
-    let res: Result<String, Box<dyn Error>> = get_download_link(name.clone(), std::env::consts::OS);
+    let res: Result<String, Box<dyn Error>> =
+        get_download_link(name.clone(), std::env::consts::OS, std::env::consts::ARCH);
     match res {
         Ok(x) => {
             install_util(name, x);
