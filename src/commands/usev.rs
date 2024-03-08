@@ -94,7 +94,7 @@ pub async fn usev_util(name: String) {
         vec![
             "-c",
             &format!(
-                "ln --symbolic {} {}/.jvem/java",
+                "ln -s {} {}/.jvem/java",
                 get_installation_dir(&name),
                 get_home_dir()
             ),
