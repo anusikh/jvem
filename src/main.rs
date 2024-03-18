@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod constants;
 pub mod utils;
+pub mod tests;
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
