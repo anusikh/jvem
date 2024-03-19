@@ -82,7 +82,7 @@ pub fn check_list_locally() {
     }
 }
 
-fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
+pub fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
     Ok(fs::read_dir(path)?.next().is_none())
 }
 
