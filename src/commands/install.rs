@@ -63,7 +63,7 @@ fn install_util(name: String, link: String) {
                 extract_tarball_linux(name);
             } else {
                 let output =
-                    run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
+                    run_command("/usr/bin/wget", vec![&format!("{}", link), "-O", &format!("/tmp/{}.tar.gz", &name)]);
                 if output.status.success() {
                     println!("fetching tarball successful ");
                     extract_tarball_linux(name);

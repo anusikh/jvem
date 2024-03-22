@@ -6,7 +6,7 @@ pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Availaible Versions:");
     for version in versions {
-        println!("{}", version);
+        println!("{}", version.to_ascii_lowercase());
     }
 
     Ok(())
