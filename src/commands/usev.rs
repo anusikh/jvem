@@ -94,7 +94,7 @@ pub async fn usev_util(name: String) {
             "-c",
             &format!(
                 "ln -s {} {}/.jvem/java",
-                get_installation_dir(&name),
+                format!("{}/Contents/Home", get_installation_dir(&name)),
                 get_home_dir()
             ),
         ],

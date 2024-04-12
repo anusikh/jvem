@@ -29,6 +29,9 @@ pub fn get_download_link(
     if let Some(value) = constants::get_constant(&env_var_name) {
         Ok(value.to_string())
     } else {
-        Err("Couldn't recognize OS or the specified JDK is not available".into())
+        Err(
+            "couldn't recognize OS, unsupported architecture or the specified JDK is not available"
+                .into(),
+        )
     }
 }
