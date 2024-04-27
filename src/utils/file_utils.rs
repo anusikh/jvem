@@ -5,6 +5,7 @@ use std::{
 };
 
 use lazy_static::lazy_static;
+use rand::Rng;
 
 fn get_home_env() -> String {
     if env::consts::OS == "windows" {
@@ -71,7 +72,8 @@ pub fn check_list_locally() {
         true => {
             for entry in fs::read_dir(path_dir).unwrap() {
                 let entry = entry.unwrap();
-                if entry.file_name() != "java" {
+                // .DS_Store is macos specific
+                if entry.file_name() != "java" && entry.file_name() != ".DS_Store" {
                     println!("{}", entry.file_name().to_str().unwrap());
                 }
             }
@@ -119,25 +121,55 @@ pub fn extract_tarball_linux(name: String) {
     }
 }
 
-pub fn extract_tarball_macos(temp_directory: &str, name: &str) {
-    let tarball_status = run_command(
-        "/usr/bin/tar",
-        vec![
-            "xvzf",
-            temp_directory,
-            "--strip-components=1",
-            "-C",
-            &format!("{}/.jvem/{}", get_home_dir(), name),
-        ],
-    );
+pub fn extract_tarball_macos(name: &str) {
+    let temp_folder_name = format!("{}", rand::thread_rng().gen::<u32>());
+    let res = fs::create_dir_all(format!("/tmp/{}", temp_folder_name));
+    match res {
+        Ok(_) => {
+            let tarball_status = run_command(
+                "/usr/bin/tar",
+                vec![
+                    "xvzf",
+                    &find_file_in_dir("/tmp/", &name),
+                    "--strip-components=1",
+                    "-C",
+                    &format!("/tmp/{}", temp_folder_name),
+                ],
+            );
 
-    if tarball_status.status.success() {
-        println!("tarball extraction successful ");
-    } else {
-        println!(
-            "tarball extraction failed: {:?} ",
-            String::from_utf8_lossy(&tarball_status.stderr)
-        );
+            if tarball_status.status.success() {
+                println!("tarball extraction successful, trying to move some files around...");
+                let mv_status = run_command(
+                    "sh",
+                    vec![
+                        "-c",
+                        &format!(
+                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}/.jvem/{}",
+                            temp_folder_name,
+                            get_home_dir(),
+                            name
+                        )
+                    ],
+                );
+
+                if mv_status.status.success() {
+                    println!("done moving files around...");
+                } else {
+                    println!(
+                        "moving files failed: {:?} ",
+                        String::from_utf8_lossy(&mv_status.stderr)
+                    );
+                }
+            } else {
+                println!(
+                    "tarball extraction failed: {:?} ",
+                    String::from_utf8_lossy(&tarball_status.stderr)
+                );
+            }
+        }
+        Err(_) => {
+            println!("could not create a temporary directory");
+        }
     }
 }
 

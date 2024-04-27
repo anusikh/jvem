@@ -6,7 +6,7 @@ pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Availaible Versions:");
     for version in versions {
-        println!("{}", version);
+        println!("{}", version.to_ascii_lowercase());
     }
 
     Ok(())
@@ -29,6 +29,9 @@ pub fn get_download_link(
     if let Some(value) = constants::get_constant(&env_var_name) {
         Ok(value.to_string())
     } else {
-        Err("Couldn't recognize OS or the specified JDK is not available".into())
+        Err(
+            "couldn't recognize OS, unsupported architecture or the specified JDK is not available"
+                .into(),
+        )
     }
 }

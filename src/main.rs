@@ -1,7 +1,7 @@
 pub mod commands;
 pub mod constants;
-pub mod utils;
 pub mod tests;
+pub mod utils;
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -25,14 +25,21 @@ struct Cli {
 
 #[derive(Parser, Debug)]
 enum Command {
-    #[clap(about)]
+    #[clap(about = "Install the specific JDK")]
     Install(Arg),
+    #[clap(about = "Uninstall the specified JDK version")]
     Uninstall(Arg),
+    #[clap(about = "Use a specific JDK version after installation")]
     Usev(Arg),
+    #[clap(about = "Clean empty folders in the .jvem directory")]
     Clean,
+    #[clap(about = "Find the currently active JDK version")]
     Current,
+    #[clap(about = "List all JDK versions available for install")]
     Lsrem,
+    #[clap(about = "List locally installed JDK versions")]
     Ls,
+    #[clap(about = "Deactivate the currently active JDK")]
     Deactivate,
 }
 

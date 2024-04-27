@@ -62,8 +62,14 @@ fn install_util(name: String, link: String) {
                 println!("fetching tarball from cache successful");
                 extract_tarball_linux(name);
             } else {
-                let output =
-                    run_command("/usr/bin/wget", vec![&format!("{}", link), "-P", "/tmp/"]);
+                let output = run_command(
+                    "/usr/bin/wget",
+                    vec![
+                        &format!("{}", link),
+                        "-O",
+                        &format!("/tmp/{}.tar.gz", &name),
+                    ],
+                );
                 if output.status.success() {
                     println!("fetching tarball successful ");
                     extract_tarball_linux(name);
@@ -86,7 +92,7 @@ fn install_util(name: String, link: String) {
 
     if std::path::Path::new(&temp_directory).exists() {
         println!("fetching tarball from cache successful");
-        extract_tarball_macos(&temp_directory, &name);
+        extract_tarball_macos(&name);
     } else {
         println!("fetching tarball...");
         let output = run_command(
@@ -96,7 +102,7 @@ fn install_util(name: String, link: String) {
 
         if output.status.success() {
             println!("fetching tarball successful ");
-            extract_tarball_macos(&temp_directory, &name);
+            extract_tarball_macos(&name);
         } else {
             println!(
                 "fetching tarball failed: {} ",
