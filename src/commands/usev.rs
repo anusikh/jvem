@@ -86,17 +86,26 @@ pub async fn usev_util(name: String) {
 
 #[cfg(target_os = "macos")]
 pub async fn usev_util(name: String) {
+    use crate::utils::file_utils::check_path_exists;
+
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
+
+    // check if Contents folder present inside extracted files (required for Graal VM support)
+    let con_path = format!("{}/Contents", get_installation_dir(&name));
+    let if_contents_exists = check_path_exists(&con_path);
+    let final_path;
+
+    if if_contents_exists == true {
+        final_path = format!("{}/Contents/Home", get_installation_dir(&name));
+    } else {
+        final_path = format!("{}/Home", get_installation_dir(&name));
+    };
 
     let output = run_command(
         "sh",
         vec![
             "-c",
-            &format!(
-                "ln -s {} {}/.jvem/java",
-                format!("{}/Contents/Home", get_installation_dir(&name)),
-                get_home_dir()
-            ),
+            &format!("ln -s {} {}/.jvem/java", final_path, get_home_dir()),
         ],
     );
 

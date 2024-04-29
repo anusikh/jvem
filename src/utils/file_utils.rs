@@ -60,6 +60,13 @@ pub fn check_jdk_exists(name: &str) -> bool {
     }
 }
 
+pub fn check_path_exists(path: &str) -> bool {
+    match Path::new(&path).exists() {
+        true => true,
+        false => false,
+    }
+}
+
 pub fn create_java_dir(name: &str) {
     let new_dir_path = format!("{}/.jvem/{}", *HOME_DIR, name);
     fs::create_dir_all(new_dir_path).unwrap();
