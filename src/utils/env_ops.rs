@@ -18,7 +18,7 @@ pub fn get_download_link(
     arch: &str,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let mut env_var_name = format!("{}_{}", name.to_uppercase(), os.to_uppercase());
-    if os == "macos" {
+    if os == "macos" || os == "linux" {
         env_var_name = format!(
             "{}_{}_{}",
             name.to_uppercase(),
