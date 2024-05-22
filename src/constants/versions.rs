@@ -87,24 +87,32 @@ pub mod constants {
         "https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_osx-x64_bin.tar.gz";
 
     // graalvm jdk's
-    pub const GRAAL22_LINUX: &str =
+    pub const GRAAL22_LINUX_X86_64: &str =
         "https://download.oracle.com/graalvm/22/latest/graalvm-jdk-22_linux-x64_bin.tar.gz";
+    pub const GRAAL22_LINUX_AARCH64: &str =
+        "https://download.oracle.com/graalvm/22/latest/graalvm-jdk-22_linux-aarch64_bin.tar.gz";
     pub const GRAAL22_WINDOWS: &str =
         "https://download.oracle.com/graalvm/22/latest/graalvm-jdk-22_windows-x64_bin.zip";
     pub const GRAAL22_MACOS_AARCH64: &str =
         "https://download.oracle.com/graalvm/22/latest/graalvm-jdk-22_macos-aarch64_bin.tar.gz";
     pub const GRAAL22_MACOS_X86_64: &str =
         "https://download.oracle.com/graalvm/22/latest/graalvm-jdk-22_macos-x64_bin.tar.gz";
-    pub const GRAAL21_LINUX: &str =
+
+    pub const GRAAL21_LINUX_X86_64: &str =
         "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz";
+    pub const GRAAL21_LINUX_AARCH64: &str =
+        "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-aarch64_bin.tar.gz";
     pub const GRAAL21_WINDOWS: &str =
         "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_windows-x64_bin.zip";
     pub const GRAAL21_MACOS_AARCH64: &str =
         "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-aarch64_bin.tar.gz";
     pub const GRAAL21_MACOS_X86_64: &str =
         "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz";
-    pub const GRAAL17_LINUX: &str =
+
+    pub const GRAAL17_LINUX_X86_64: &str =
         "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_linux-x64_bin.tar.gz";
+    pub const GRAAL17_LINUX_AARCH64: &str =
+        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_linux-aarch64_bin.tar.gz";
     pub const GRAAL17_WINDOWS: &str =
         "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_windows-x64_bin.zip";
     pub const GRAAL17_MACOS_AARCH64: &str =
@@ -173,15 +181,20 @@ pub mod constants {
             "OPENJDK11_MACOS_X86_64" => Some(OPENJDK11_MACOS_X86_64),
 
             // graalvm jdk's
-            "GRAAL22_LINUX" => Some(GRAAL22_LINUX),
+            "GRAAL22_LINUX_X86_64" => Some(GRAAL22_LINUX_X86_64),
+            "GRAAL22_LINUX_AARCH64" => Some(GRAAL22_LINUX_AARCH64),
             "GRAAL22_WINDOWS" => Some(GRAAL22_WINDOWS),
             "GRAAL22_MACOS_AARCH64" => Some(GRAAL22_MACOS_AARCH64),
             "GRAAL22_MACOS_X86_64" => Some(GRAAL22_MACOS_X86_64),
-            "GRAAL21_LINUX" => Some(GRAAL21_LINUX),
+
+            "GRAAL21_LINUX_X86_64" => Some(GRAAL21_LINUX_X86_64),
+            "GRAAL21_LINUX_AARCH64" => Some(GRAAL21_LINUX_AARCH64),
             "GRAAL21_WINDOWS" => Some(GRAAL21_WINDOWS),
             "GRAAL21_MACOS_AARCH64" => Some(GRAAL21_MACOS_AARCH64),
             "GRAAL21_MACOS_X86_64" => Some(GRAAL21_MACOS_X86_64),
-            "GRAAL17_LINUX" => Some(GRAAL17_LINUX),
+
+            "GRAAL17_LINUX_X86_64" => Some(GRAAL17_LINUX_X86_64),
+            "GRAAL17_LINUX_AARCH64" => Some(GRAAL17_LINUX_AARCH64),
             "GRAAL17_WINDOWS" => Some(GRAAL17_WINDOWS),
             "GRAAL17_MACOS_AARCH64" => Some(GRAAL17_MACOS_AARCH64),
             "GRAAL17_MACOS_X86_64" => Some(GRAAL17_MACOS_X86_64),
