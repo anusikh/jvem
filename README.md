@@ -51,7 +51,8 @@ To get started with JVeM, refer to the installation instructions and basic usage
 
 - Download the latest `jvem_linux.tar.gz` file from [Releases](https://github.com/anusikh/jvem/releases)
 - Extract the tarball file.
-- Add this line to your zshrc/bashrc file: `PATH=$PATH:$HOME/.jvem/java/bin` and source it.
+- Add this line to your zshrc/bashrc file: `PATH=$PATH:$HOME/.jvem/java/bin`
+- Also add this line `JAVA_HOME=$HOME/.jvem/java` and then source the rc file
 - Add an alias to use jvem easily. `alias jvem=~/Downloads/jvem`
 
 ## Usage:
