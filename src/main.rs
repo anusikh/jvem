@@ -9,10 +9,10 @@ use std::sync::{
 };
 
 use clap::{Parser, Subcommand, ValueEnum};
-use commands::java::{
+use commands::{java::{
     clean::clean, current::current, deactivate::deactivate, install::install, ls::ls, lsrem::lsrem,
     uninstall::uninstall, usev::usev,
-};
+}, maven};
 use tokio::signal;
 
 #[derive(Parser, Debug)]
@@ -30,6 +30,11 @@ enum Lang {
         #[clap(help = "the java action to be performed")]
         action: Option<Command>,
         param: Option<String>,
+    },
+    #[clap(about = "maven management")]
+    Maven {
+        #[clap(help = "the maven action to be performed")]
+        action: Option<MavenCommand>,
     },
 }
 
@@ -53,6 +58,14 @@ enum Command {
     Deactivate,
 }
 
+#[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
+enum MavenCommand {
+    #[clap(help = "install maven to system")]
+    Install,
+    #[clap(help = "uninstall maven from system")]
+    Uninstall,
+}
+
 impl std::str::FromStr for Command {
     type Err = String;
 
@@ -66,7 +79,19 @@ impl std::str::FromStr for Command {
             "usev" => Ok(Command::Usev),
             "deactivate" => Ok(Command::Deactivate),
             "clean" => Ok(Command::Clean),
-            _ => Err(format!("Invalid Java action: {}", s)),
+            _ => Err(format!("invalid Java action: {}", s)),
+        }
+    }
+}
+
+impl std::str::FromStr for MavenCommand {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "install" => Ok(MavenCommand::Install),
+            "uninstall" => Ok(MavenCommand::Uninstall),
+            _ => Err(format!("invalid Java action: {}", s)),
         }
     }
 }
@@ -99,10 +124,22 @@ async fn handle_java_action(action: Option<Command>, param: Option<String>) {
     }
 }
 
+async fn handle_maven_action(action: Option<MavenCommand>) {
+    if let Some(action) = action {
+        match action {
+            MavenCommand::Install => maven::install::install(),
+            MavenCommand::Uninstall => maven::uninstall::uninstall()
+        }
+    } else {
+        println!("enter valid action, for more details use --help or -h");
+    }
+}
+
 async fn logic(running: Arc<AtomicBool>) {
     while running.load(Ordering::Relaxed) {
         match Cli::parse().cmd {
             Lang::Java { action, param } => handle_java_action(action, param).await,
+            Lang::Maven { action } => handle_maven_action(action).await ,
         }
 
         // the below step is important to prevent infinite loop on failure

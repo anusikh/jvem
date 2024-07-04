@@ -60,6 +60,14 @@ pub fn check_jdk_exists(name: &str) -> bool {
     }
 }
 
+pub fn check_maven_exists() -> bool {
+    let m_path = format!("{}/.jvem/maven/bin", get_home_dir());
+    match Path::new(&m_path).exists() {
+        true => true,
+        false => false,
+    }
+}
+
 pub fn check_path_exists(path: &str) -> bool {
     match Path::new(&path).exists() {
         true => true,
@@ -115,20 +123,32 @@ pub fn clean_jvem() {
     }
 }
 
-pub fn extract_tarball_linux(name: String) {
+pub fn extract_tarball_linux(name: String, command: String) {
+    let tar_location = match command.as_str() {
+        "java" => &find_file_in_dir("/tmp", &name),
+        "maven" => "/tmp/maven.tar.gz",
+        _ => "",
+    };
+
+    let ext_location = match command.as_str() {
+        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
     let tarball_status = run_command(
         "/usr/bin/tar",
         vec![
             "xvzf",
-            &find_file_in_dir("/tmp/", &name),
+            tar_location,
             "--strip-components=1",
             "-C",
-            &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
+            ext_location
         ],
     );
 
     if tarball_status.status.success() {
-        println!("tarball extraction successful ");
+        println!("tarball extraction successful");
     } else {
         println!(
             "tarball extraction failed: {:?} ",

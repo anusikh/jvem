@@ -60,7 +60,7 @@ fn install_util(name: String, link: String) {
 
             if x.ends_with(".gz") {
                 println!("fetching tarball from cache successful");
-                extract_tarball_linux(name);
+                extract_tarball_linux(name, String::from("java"));
             } else {
                 let output = run_command(
                     "/usr/bin/wget",
@@ -72,7 +72,7 @@ fn install_util(name: String, link: String) {
                 );
                 if output.status.success() {
                     println!("fetching tarball successful ");
-                    extract_tarball_linux(name);
+                    extract_tarball_linux(name, String::from("java"));
                 } else {
                     println!("fetching tarball failed ");
                 }
