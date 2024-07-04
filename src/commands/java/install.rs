@@ -17,7 +17,7 @@ fn install_util(name: String, link: String) {
 
             if std::path::Path::new(&temp_directory).exists() {
                 println!("fetching tarball from cache successful");
-                extract_zip(&temp_directory, &name);
+                extract_zip(&temp_directory, &name, String::from("java"));
             } else {
                 println!("fetching zip...");
                 let output = run_command(
@@ -29,13 +29,13 @@ fn install_util(name: String, link: String) {
                         "-outf",
                         &temp_directory,
                         "-Uri",
-                        &format!("{}", link),
+                        &link
                     ],
                 );
 
                 if output.status.success() {
                     println!("fetching zip successful ");
-                    extract_zip(&temp_directory, &name);
+                    extract_zip(&temp_directory, &name, String::from("java"));
                 } else {
                     println!(
                         "fetching zip failed: {} ",

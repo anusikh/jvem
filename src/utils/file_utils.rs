@@ -80,6 +80,11 @@ pub fn create_java_dir(name: &str) {
     fs::create_dir_all(new_dir_path).unwrap();
 }
 
+pub fn create_maven_dir() {
+    let new_dir = format!("{}/.jvem/maven", *HOME_DIR);
+    fs::create_dir_all(new_dir).unwrap();
+}
+
 pub fn check_list_locally() {
     let jvem_dir = format!("{}/.jvem/java_versions/", get_home_dir());
     let path_dir = Path::new(&jvem_dir);
@@ -143,7 +148,7 @@ pub fn extract_tarball_linux(name: String, command: String) {
             tar_location,
             "--strip-components=1",
             "-C",
-            ext_location
+            ext_location,
         ],
     );
 
@@ -209,15 +214,20 @@ pub fn extract_tarball_macos(name: &str) {
     }
 }
 
-pub fn extract_zip(temp_dir: &str, name: &str) {
+pub fn extract_zip(temp_dir: &str, name: &str, command: String) {
+    let output_path = match command.as_str() {
+        "java" => &get_installation_dir(name),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
     let unzip_output = run_command(
         "powershell",
         vec![
             "-Command",
             &format!(
-                "Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1}",
-                temp_dir,
-                get_installation_dir(name),
+                "$ProgressPreference = 'SilentlyContinue';Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1};$ProgressPreference = 'Continue'",
+                temp_dir, output_path,
             ),
         ],
     );
