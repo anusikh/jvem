@@ -77,16 +77,25 @@ pub fn check_list_locally() {
     let path_dir = Path::new(&jvem_dir);
     match path_dir.exists() {
         true => {
+            let mut res: Vec<String> = Vec::new();
+
             for entry in fs::read_dir(path_dir).unwrap() {
                 let entry = entry.unwrap();
                 // .DS_Store is macos specific
                 if entry.file_name() != "java" && entry.file_name() != ".DS_Store" {
-                    println!("{}", entry.file_name().to_str().unwrap());
+                    res.push(String::from(entry.file_name().to_str().unwrap()));
                 }
+            }
+            if res.len() > 0 {
+                for item in res {
+                    println!("{}", item);
+                }
+            } else {
+                println!("no jdk installations found locally");
             }
         }
         false => {
-            println!("{}", "no jdk installations found locally");
+            println!("no jdk installations found locally");
         }
     }
 }

@@ -8,7 +8,7 @@ use std::sync::{
     Arc,
 };
 
-use clap::Parser;
+use clap::{Parser, Subcommand, ValueEnum};
 use tokio::signal;
 
 use crate::commands::{
@@ -20,49 +20,72 @@ use crate::commands::{
 #[command(version, about, long_about = None)]
 struct Cli {
     #[clap(subcommand)]
-    cmd: Command,
+    cmd: Lang,
 }
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Clone, Subcommand)]
+enum Lang {
+    #[clap(about = "java version management")]
+    Java {
+        // #[arg(short, long, value_enum, help = "the Java action to perform")]
+        #[clap(help = "the java action to be performed")]
+        action: Option<Command>,
+        param: Option<String>,
+    },
+}
+
+#[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
 enum Command {
-    #[clap(about = "Install the specific JDK")]
-    Install(Arg),
-    #[clap(about = "Uninstall the specified JDK version")]
-    Uninstall(Arg),
-    #[clap(about = "Use a specific JDK version after installation")]
-    Usev(Arg),
-    #[clap(about = "Clean empty folders in the .jvem directory")]
+    #[clap(help = "install the specific JDK")]
+    Install,
+    #[clap(help = "uninstall the specified JDK version")]
+    Uninstall,
+    #[clap(help = "use a specific JDK version after installation")]
+    Usev,
+    #[clap(help = "clean empty folders in the .jvem directory")]
     Clean,
-    #[clap(about = "Find the currently active JDK version")]
+    #[clap(help = "find the currently active JDK version")]
     Current,
-    #[clap(about = "List all JDK versions available for install")]
+    #[clap(help = "list all JDK versions available for install")]
     Lsrem,
-    #[clap(about = "List locally installed JDK versions")]
+    #[clap(help = "list locally installed JDK versions")]
     Ls,
-    #[clap(about = "Deactivate the currently active JDK")]
+    #[clap(help = "deactivate the currently active JDK")]
     Deactivate,
 }
 
-#[derive(Parser, Debug)]
-struct Arg {
-    #[clap(index = 1)]
-    arg: String,
+impl std::str::FromStr for Command {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "install" => Ok(Command::Install),
+            "lsrem" => Ok(Command::Lsrem),
+            "ls" => Ok(Command::Ls),
+            "current" => Ok(Command::Current),
+            "uninstall" => Ok(Command::Uninstall),
+            "usev" => Ok(Command::Usev),
+            "deactivate" => Ok(Command::Deactivate),
+            "clean" => Ok(Command::Clean),
+            _ => Err(format!("Invalid Java action: {}", s)),
+        }
+    }
 }
 
-async fn logic(running: Arc<AtomicBool>) {
-    while running.load(Ordering::Relaxed) {
-        match Cli::parse().cmd {
-            Command::Install(arg) => {
-                let jdk = arg.arg;
+async fn handle_java_action(action: Option<Command>, param: Option<String>) {
+    if let Some(action) = action {
+        match action {
+            Command::Install => {
+                let jdk = param.unwrap();
                 install(jdk);
             }
             Command::Current => current(),
-            Command::Uninstall(arg) => {
-                let jdk = arg.arg;
+            Command::Uninstall => {
+                let jdk = param.unwrap();
                 uninstall(jdk);
             }
-            Command::Usev(arg) => {
-                let jdk = arg.arg;
+            Command::Usev => {
+                let jdk = param.unwrap();
                 usev(jdk).await;
             }
             Command::Lsrem => {
@@ -72,6 +95,17 @@ async fn logic(running: Arc<AtomicBool>) {
             Command::Deactivate => deactivate(),
             Command::Clean => clean(),
         }
+    } else {
+        println!("enter valid action");
+    }
+}
+
+async fn logic(running: Arc<AtomicBool>) {
+    while running.load(Ordering::Relaxed) {
+        match Cli::parse().cmd {
+            Lang::Java { action, param } => handle_java_action(action, param).await,
+        }
+
         // the below step is important to prevent infinite loop on failure
         running.store(false, Ordering::Relaxed);
     }
