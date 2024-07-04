@@ -1,6 +1,8 @@
 use lazy_static::lazy_static;
 
-use crate::utils::file_utils::{check_maven_exists, find_file_in_dir, run_command};
+use crate::utils::file_utils::{
+    check_maven_exists, extract_tarball_linux, find_file_in_dir, get_home_dir, run_command,
+};
 
 lazy_static! {
     static ref MAVEN_DOWN_URL: String = String::from(
@@ -10,8 +12,6 @@ lazy_static! {
 
 #[cfg(target_os = "linux")]
 fn install_util() {
-    use crate::utils::file_utils::{extract_tarball_linux, get_home_dir};
-
     match check_maven_exists() {
         false => {
             let maven_path = format!("{}/.jvem/maven", get_home_dir());
