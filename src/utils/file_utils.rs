@@ -49,7 +49,7 @@ pub fn get_home_dir() -> String {
 }
 
 pub fn get_installation_dir(name: &str) -> String {
-    format!("{}/.jvem/{}", get_home_dir(), name)
+    format!("{}/.jvem/java_versions/{}", get_home_dir(), name)
 }
 
 pub fn check_jdk_exists(name: &str) -> bool {
@@ -68,12 +68,12 @@ pub fn check_path_exists(path: &str) -> bool {
 }
 
 pub fn create_java_dir(name: &str) {
-    let new_dir_path = format!("{}/.jvem/{}", *HOME_DIR, name);
+    let new_dir_path = format!("{}/.jvem/java_versions/{}", *HOME_DIR, name);
     fs::create_dir_all(new_dir_path).unwrap();
 }
 
 pub fn check_list_locally() {
-    let jvem_dir = format!("{}/.jvem/", get_home_dir());
+    let jvem_dir = format!("{}/.jvem/java_versions/", get_home_dir());
     let path_dir = Path::new(&jvem_dir);
     match path_dir.exists() {
         true => {
@@ -105,7 +105,7 @@ pub fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
 }
 
 pub fn clean_jvem() {
-    for entry in fs::read_dir(format!("{}/.jvem", get_home_dir())).unwrap() {
+    for entry in fs::read_dir(format!("{}/.jvem/java_versions", get_home_dir())).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
 
@@ -123,7 +123,7 @@ pub fn extract_tarball_linux(name: String) {
             &find_file_in_dir("/tmp/", &name),
             "--strip-components=1",
             "-C",
-            &format!("{}/.jvem/{}", get_home_dir(), name),
+            &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
         ],
     );
 
@@ -160,7 +160,7 @@ pub fn extract_tarball_macos(name: &str) {
                     vec![
                         "-c",
                         &format!(
-                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}/.jvem/{}",
+                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}/.jvem/java_versions/{}",
                             temp_folder_name,
                             get_home_dir(),
                             name

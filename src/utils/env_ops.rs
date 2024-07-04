@@ -1,4 +1,4 @@
-use crate::constants::versions::constants;
+use crate::constants::java_versions::constants;
 
 pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
     let available_versions = constants::AVAILABLE_VERSIONS;

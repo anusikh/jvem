@@ -9,12 +9,11 @@ use std::sync::{
 };
 
 use clap::{Parser, Subcommand, ValueEnum};
-use tokio::signal;
-
-use crate::commands::{
+use commands::java::{
     clean::clean, current::current, deactivate::deactivate, install::install, ls::ls, lsrem::lsrem,
     uninstall::uninstall, usev::usev,
 };
+use tokio::signal;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -96,7 +95,7 @@ async fn handle_java_action(action: Option<Command>, param: Option<String>) {
             Command::Clean => clean(),
         }
     } else {
-        println!("enter valid action");
+        println!("enter valid action. for more details use --help or -h");
     }
 }
 
