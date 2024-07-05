@@ -29,7 +29,7 @@ fn install_util(name: String, link: String) {
                         "-outf",
                         &temp_directory,
                         "-Uri",
-                        &link
+                        &link,
                     ],
                 );
 
@@ -92,17 +92,14 @@ fn install_util(name: String, link: String) {
 
     if std::path::Path::new(&temp_directory).exists() {
         println!("fetching tarball from cache successful");
-        extract_tarball_macos(&name);
+        extract_tarball_macos(&name, "java");
     } else {
         println!("fetching tarball...");
-        let output = run_command(
-            "/usr/bin/curl",
-            vec!["-o", &temp_directory, &format!("{}", link)],
-        );
+        let output = run_command("/usr/bin/curl", vec!["-o", &temp_directory, &link]);
 
         if output.status.success() {
             println!("fetching tarball successful ");
-            extract_tarball_macos(&name);
+            extract_tarball_macos(&name, "java");
         } else {
             println!(
                 "fetching tarball failed: {} ",

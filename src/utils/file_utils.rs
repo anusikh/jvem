@@ -162,44 +162,51 @@ pub fn extract_tarball_linux(name: String, command: String) {
     }
 }
 
-pub fn extract_tarball_macos(name: &str) {
+pub fn extract_tarball_macos(name: &str, command: &str) {
     let temp_folder_name = format!("{}", rand::thread_rng().gen::<u32>());
+    let tar_path = match command {
+        "java" => &find_file_in_dir("/tmp/", &name),
+        "maven" => "/tmp/maven.tar.gz",
+        _ => "",
+    };
+
+    let output_path = match command {
+        "java" => &format!("/tmp/{}", temp_folder_name),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
     let res = fs::create_dir_all(format!("/tmp/{}", temp_folder_name));
     match res {
         Ok(_) => {
             let tarball_status = run_command(
                 "/usr/bin/tar",
-                vec![
-                    "xvzf",
-                    &find_file_in_dir("/tmp/", &name),
-                    "--strip-components=1",
-                    "-C",
-                    &format!("/tmp/{}", temp_folder_name),
-                ],
+                vec!["xvzf", tar_path, "--strip-components=1", "-C", output_path],
             );
 
             if tarball_status.status.success() {
                 println!("tarball extraction successful, trying to move some files around...");
-                let mv_status = run_command(
-                    "sh",
-                    vec![
-                        "-c",
-                        &format!(
-                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}/.jvem/java_versions/{}",
+                if command.eq("java") {
+                    let mv_status = run_command(
+                        "sh",
+                        vec![
+                            "-c",
+                            &format!(
+                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}",
                             temp_folder_name,
-                            get_home_dir(),
-                            name
-                        )
-                    ],
-                );
-
-                if mv_status.status.success() {
-                    println!("done moving files around...");
-                } else {
-                    println!(
-                        "moving files failed: {:?} ",
-                        String::from_utf8_lossy(&mv_status.stderr)
+                            &format!("{}/.jvem/java_versions/{}", get_home_dir(), name)
+                        ),
+                        ],
                     );
+
+                    if mv_status.status.success() {
+                        println!("done moving files around...");
+                    } else {
+                        println!(
+                            "moving files failed: {:?} ",
+                            String::from_utf8_lossy(&mv_status.stderr)
+                        );
+                    }
                 }
             } else {
                 println!(

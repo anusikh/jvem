@@ -1,8 +1,8 @@
 use lazy_static::lazy_static;
 
 use crate::utils::file_utils::{
-    check_maven_exists, extract_tarball_linux, find_file_in_dir, get_home_dir, run_command,
-    create_maven_dir
+    check_maven_exists, create_maven_dir, extract_tarball_linux, find_file_in_dir, get_home_dir,
+    run_command,
 };
 
 lazy_static! {
@@ -27,7 +27,6 @@ fn install_util() {
                 extract_zip(&temp_directory, "", String::from("maven"));
             }else {
                 println!("fetching zip...");
-                
                 let output = run_command(
                     "powershell",
                     vec![
@@ -37,7 +36,7 @@ fn install_util() {
                         "-outf",
                         &temp_directory,
                         "-Uri",
-                        &MAVEN_DOWN_URL_WIN 
+                        &MAVEN_DOWN_URL_WIN
                     ],
                 );
 
@@ -78,6 +77,39 @@ fn install_util() {
                 }
             }
         }
+        true => println!("maven already exists, if it doesn't please run the uninstall command and try re-installing it"),
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn install_util() {
+    use crate::utils::file_utils::extract_tarball_macos;
+
+    match check_maven_exists() {
+        false => {
+            create_maven_dir();
+            let temp_directory = "/tmp/maven.tar.gz";
+            if std::path::Path::new(temp_directory).exists() {
+                println!("fetching tarball from cache successful");
+                extract_tarball_macos("", "maven");
+            } else {
+                println!("fetching tarball");
+                let output = run_command(
+                    "/usr/bin/curl",
+                    vec!["-o", temp_directory,&MAVEN_DOWN_URL]
+                );
+
+                if output.status.success() {
+                    println!("fetching tarball successful");
+                    extract_tarball_macos("", "maven");
+                } else {
+                    println!(
+                        "fetching tarball failed: {} ",
+                        String::from_utf8_lossy(&output.stderr)
+                    );
+                }
+            }
+        },
         true => println!("maven already exists, if it doesn't please run the uninstall command and try re-installing it"),
     }
 }
