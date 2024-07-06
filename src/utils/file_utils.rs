@@ -128,15 +128,15 @@ pub fn clean_jvem() {
     }
 }
 
-pub fn extract_tarball_linux(name: String, command: String) {
-    let tar_location = match command.as_str() {
-        "java" => &find_file_in_dir("/tmp", &name),
+pub fn extract_tarball_linux(name: &str, command: &str) {
+    let tar_location = match command {
+        "java" => &find_file_in_dir("/tmp", name),
         "maven" => "/tmp/maven.tar.gz",
         _ => "",
     };
 
-    let ext_location = match command.as_str() {
-        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
+    let ext_location = match command {
+        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), String::from(name)),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",
     };
@@ -221,8 +221,8 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
     }
 }
 
-pub fn extract_zip(temp_dir: &str, name: &str, command: String) {
-    let output_path = match command.as_str() {
+pub fn extract_zip(temp_dir: &str, name: &str, command: &str) {
+    let output_path = match command {
         "java" => &get_installation_dir(name),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",

@@ -17,7 +17,7 @@ fn install_util(name: String, link: String) {
 
             if std::path::Path::new(&temp_directory).exists() {
                 println!("fetching tarball from cache successful");
-                extract_zip(&temp_directory, &name, String::from("java"));
+                extract_zip(&temp_directory, &name, "java");
             } else {
                 println!("fetching zip...");
                 let output = run_command(
@@ -35,7 +35,7 @@ fn install_util(name: String, link: String) {
 
                 if output.status.success() {
                     println!("fetching zip successful ");
-                    extract_zip(&temp_directory, &name, String::from("java"));
+                    extract_zip(&temp_directory, &name, "java");
                 } else {
                     println!(
                         "fetching zip failed: {} ",
@@ -60,7 +60,7 @@ fn install_util(name: String, link: String) {
 
             if x.ends_with(".gz") {
                 println!("fetching tarball from cache successful");
-                extract_tarball_linux(name, String::from("java"));
+                extract_tarball_linux(&name, "java");
             } else {
                 let output = run_command(
                     "/usr/bin/wget",
@@ -72,7 +72,7 @@ fn install_util(name: String, link: String) {
                 );
                 if output.status.success() {
                     println!("fetching tarball successful ");
-                    extract_tarball_linux(name, String::from("java"));
+                    extract_tarball_linux(&name, "java");
                 } else {
                     println!("fetching tarball failed ");
                 }
