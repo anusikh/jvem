@@ -85,30 +85,37 @@ pub fn create_maven_dir() {
     fs::create_dir_all(new_dir).unwrap();
 }
 
-pub fn check_list_locally() {
-    let jvem_dir = format!("{}/.jvem/java_versions/", get_home_dir());
-    let path_dir = Path::new(&jvem_dir);
-    match path_dir.exists() {
-        true => {
-            let mut res: Vec<String> = Vec::new();
+pub fn check_list_locally(command: &str) {
+    let dir = match command {
+        "java" => "java_versions",
+        "node" => "node_versions",
+        _ => "",
+    };
+    if !dir.is_empty() {
+        let jvem_dir = format!("{}/.jvem/{}/", get_home_dir(), dir);
+        let path_dir = Path::new(&jvem_dir);
+        match path_dir.exists() {
+            true => {
+                let mut res: Vec<String> = Vec::new();
 
-            for entry in fs::read_dir(path_dir).unwrap() {
-                let entry = entry.unwrap();
-                // .DS_Store is macos specific
-                if entry.file_name() != "java" && entry.file_name() != ".DS_Store" {
-                    res.push(String::from(entry.file_name().to_str().unwrap()));
+                for entry in fs::read_dir(path_dir).unwrap() {
+                    let entry = entry.unwrap();
+                    // .DS_Store is macos specific
+                    if entry.file_name() != ".DS_Store" {
+                        res.push(String::from(entry.file_name().to_str().unwrap()));
+                    }
+                }
+                if res.len() > 0 {
+                    for item in res {
+                        println!("{}", item);
+                    }
+                } else {
+                    println!("no installations found locally");
                 }
             }
-            if res.len() > 0 {
-                for item in res {
-                    println!("{}", item);
-                }
-            } else {
-                println!("no jdk installations found locally");
+            false => {
+                println!("no installations found locally");
             }
-        }
-        false => {
-            println!("no jdk installations found locally");
         }
     }
 }
@@ -117,13 +124,20 @@ pub fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
     Ok(fs::read_dir(path)?.next().is_none())
 }
 
-pub fn clean_jvem() {
-    for entry in fs::read_dir(format!("{}/.jvem/java_versions", get_home_dir())).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
+pub fn clean_jvem(command: &str) {
+    let dir = match command {
+        "java" => "java_versions",
+        "node" => "node_versions",
+        _ => "",
+    };
+    if !dir.is_empty() {
+        for entry in fs::read_dir(format!("{}/.jvem/{}", get_home_dir(), dir)).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
 
-        if path.is_dir() && is_empty_dir(&path).unwrap() {
-            fs::remove_dir(&path).unwrap();
+            if path.is_dir() && is_empty_dir(&path).unwrap() {
+                fs::remove_dir(&path).unwrap();
+            }
         }
     }
 }
@@ -136,7 +150,11 @@ pub fn extract_tarball_linux(name: &str, command: &str) {
     };
 
     let ext_location = match command {
-        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), String::from(name)),
+        "java" => &format!(
+            "{}/.jvem/java_versions/{}",
+            get_home_dir(),
+            String::from(name)
+        ),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",
     };

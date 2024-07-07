@@ -31,8 +31,6 @@ fn uninstall_util(name: &str) {
 
 #[cfg(target_os = "macos")]
 fn uninstall_util(name: &str) {
-    // ToDo
-
     let output = run_command(
         "rm",
         vec!["-rf", &format!("{}", get_installation_dir(&name))],

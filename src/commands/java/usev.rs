@@ -1,4 +1,6 @@
-use crate::utils::file_utils::{check_jdk_exists, get_home_dir, get_installation_dir, run_command};
+use crate::utils::file_utils::{
+    check_jdk_exists, check_path_exists, get_home_dir, get_installation_dir, run_command,
+};
 
 #[cfg(target_os = "windows")]
 async fn usev_util(name: String) {
@@ -86,8 +88,6 @@ pub async fn usev_util(name: String) {
 
 #[cfg(target_os = "macos")]
 pub async fn usev_util(name: String) {
-    use crate::utils::file_utils::check_path_exists;
-
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 
     // check if Contents folder present inside extracted files (required for Graal VM support)

@@ -9,10 +9,13 @@ use std::sync::{
 };
 
 use clap::{Parser, Subcommand, ValueEnum};
-use commands::{java::{
-    clean::clean, current::current, deactivate::deactivate, install::install, ls::ls, lsrem::lsrem,
-    uninstall::uninstall, usev::usev,
-}, maven};
+use commands::{
+    java::{
+        clean::clean, current::current, deactivate::deactivate, install::install, ls::ls,
+        lsrem::lsrem, uninstall::uninstall, usev::usev,
+    },
+    maven, node,
+};
 use tokio::signal;
 
 #[derive(Parser, Debug)]
@@ -36,6 +39,11 @@ enum Lang {
         #[clap(help = "the maven action to be performed")]
         action: Option<MavenCommand>,
     },
+    #[clap(about = "node version management")]
+    Node {
+        action: Option<NodeCommand>,
+        param: Option<String>,
+    },
 }
 
 #[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
@@ -46,7 +54,7 @@ enum Command {
     Uninstall,
     #[clap(help = "use a specific JDK version after installation")]
     Usev,
-    #[clap(help = "clean empty folders in the .jvem directory")]
+    #[clap(help = "clean empty folders in the .jvem/java_versions directory")]
     Clean,
     #[clap(help = "find the currently active JDK version")]
     Current,
@@ -55,6 +63,26 @@ enum Command {
     #[clap(help = "list locally installed JDK versions")]
     Ls,
     #[clap(help = "deactivate the currently active JDK")]
+    Deactivate,
+}
+
+#[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
+enum NodeCommand {
+    #[clap(help = "install the specific node version")]
+    Install,
+    #[clap(help = "uninstall the specified node version")]
+    Uninstall,
+    #[clap(help = "use a specific node version after installation")]
+    Usev,
+    #[clap(help = "clean empty folders in the .jvem/node_versions directory")]
+    Clean,
+    #[clap(help = "find the currently active node version")]
+    Current,
+    #[clap(help = "list all node versions available for install")]
+    Lsrem,
+    #[clap(help = "list locally installed node versions")]
+    Ls,
+    #[clap(help = "deactivate the currently active node version")]
     Deactivate,
 }
 
@@ -84,6 +112,24 @@ impl std::str::FromStr for Command {
     }
 }
 
+impl std::str::FromStr for NodeCommand {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "install" => Ok(NodeCommand::Install),
+            "lsrem" => Ok(NodeCommand::Lsrem),
+            "ls" => Ok(NodeCommand::Ls),
+            "current" => Ok(NodeCommand::Current),
+            "uninstall" => Ok(NodeCommand::Uninstall),
+            "usev" => Ok(NodeCommand::Usev),
+            "deactivate" => Ok(NodeCommand::Deactivate),
+            "clean" => Ok(NodeCommand::Clean),
+            _ => Err(format!("invalid Node action: {}", s)),
+        }
+    }
+}
+
 impl std::str::FromStr for MavenCommand {
     type Err = String;
 
@@ -91,7 +137,7 @@ impl std::str::FromStr for MavenCommand {
         match s.to_lowercase().as_str() {
             "install" => Ok(MavenCommand::Install),
             "uninstall" => Ok(MavenCommand::Uninstall),
-            _ => Err(format!("invalid Java action: {}", s)),
+            _ => Err(format!("invalid Maven action: {}", s)),
         }
     }
 }
@@ -112,9 +158,7 @@ async fn handle_java_action(action: Option<Command>, param: Option<String>) {
                 let jdk = param.unwrap();
                 usev(jdk).await;
             }
-            Command::Lsrem => {
-                let _ = lsrem();
-            }
+            Command::Lsrem => lsrem(),
             Command::Ls => ls(),
             Command::Deactivate => deactivate(),
             Command::Clean => clean(),
@@ -128,7 +172,22 @@ async fn handle_maven_action(action: Option<MavenCommand>) {
     if let Some(action) = action {
         match action {
             MavenCommand::Install => maven::install::install(),
-            MavenCommand::Uninstall => maven::uninstall::uninstall()
+            MavenCommand::Uninstall => maven::uninstall::uninstall(),
+        }
+    } else {
+        println!("enter valid action, for more details use --help or -h");
+    }
+}
+
+async fn handle_nodejs_action(action: Option<NodeCommand>, param: Option<String>) {
+    if let Some(action) = action {
+        match action {
+            NodeCommand::Lsrem => node::lsrem::lsrem(),
+            NodeCommand::Ls => node::ls::ls(),
+            NodeCommand::Clean => node::clean::clean(),
+            NodeCommand::Current => node::current::current().await,
+            NodeCommand::Deactivate => node::deactivate::deactivate(),
+            _ => println!("not implemented yet"),
         }
     } else {
         println!("enter valid action, for more details use --help or -h");
@@ -139,7 +198,8 @@ async fn logic(running: Arc<AtomicBool>) {
     while running.load(Ordering::Relaxed) {
         match Cli::parse().cmd {
             Lang::Java { action, param } => handle_java_action(action, param).await,
-            Lang::Maven { action } => handle_maven_action(action).await ,
+            Lang::Maven { action } => handle_maven_action(action).await,
+            Lang::Node { action, param } => handle_nodejs_action(action, param).await,
         }
 
         // the below step is important to prevent infinite loop on failure
@@ -149,7 +209,7 @@ async fn logic(running: Arc<AtomicBool>) {
 
 #[tokio::main]
 async fn main() {
-    // the below logic is used for ctrl+c handling
+    // NOTE: the below logic is used for ctrl+c handling
     // the idea here is to set a boolean atomic value, when program is running
     // on ctrl+c, the value is set to false and it stops the process
 
