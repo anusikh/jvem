@@ -4,7 +4,7 @@ use crate::utils::file_utils::{
 
 #[cfg(target_os = "windows")]
 fn usev_util(version: String) {
-    let node_path = get_installation_dir(&name, "node");
+    let node_path = get_installation_dir(&version, "node");
 
     println!("creating symlink...");
 
