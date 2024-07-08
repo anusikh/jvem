@@ -48,12 +48,18 @@ pub fn get_home_dir() -> String {
     res.to_string()
 }
 
-pub fn get_installation_dir(name: &str) -> String {
-    format!("{}/.jvem/java_versions/{}", get_home_dir(), name)
+pub fn get_installation_dir(name: &str, command: &str) -> String {
+    let res = match command {
+        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
+        "node" => &format!("{}/.jvem/node_versions/{}", get_home_dir(), name),
+        "maven" => &format!("{}/.jvem/maven/bin", get_home_dir()),
+        _ => "",
+    };
+    String::from(res)
 }
 
 pub fn check_jdk_exists(name: &str) -> bool {
-    let d_path = get_installation_dir(name);
+    let d_path = get_installation_dir(name, "java");
     match Path::new(&d_path).exists() {
         true => true,
         false => false,
@@ -61,8 +67,16 @@ pub fn check_jdk_exists(name: &str) -> bool {
 }
 
 pub fn check_maven_exists() -> bool {
-    let m_path = format!("{}/.jvem/maven/bin", get_home_dir());
+    let m_path = get_installation_dir("", "maven");
     match Path::new(&m_path).exists() {
+        true => true,
+        false => false,
+    }
+}
+
+pub fn check_node_exists(version: &str) -> bool {
+    let n_path = get_installation_dir(version, "node");
+    match Path::new(&n_path).exists() {
         true => true,
         false => false,
     }
@@ -82,6 +96,11 @@ pub fn create_java_dir(name: &str) {
 
 pub fn create_maven_dir() {
     let new_dir = format!("{}/.jvem/maven", *HOME_DIR);
+    fs::create_dir_all(new_dir).unwrap();
+}
+
+pub fn create_node_dir() {
+    let new_dir = format!("{}/.jvem/node_versions", *HOME_DIR);
     fs::create_dir_all(new_dir).unwrap();
 }
 
@@ -183,18 +202,26 @@ pub fn extract_tarball_linux(name: &str, command: &str) {
 pub fn extract_tarball_macos(name: &str, command: &str) {
     let temp_folder_name = format!("{}", rand::thread_rng().gen::<u32>());
     let tar_path = match command {
-        "java" => &find_file_in_dir("/tmp/", &name),
+        "java" | "node" => &find_file_in_dir("/tmp/", &name),
         "maven" => "/tmp/maven.tar.gz",
         _ => "",
     };
 
     let output_path = match command {
         "java" => &format!("/tmp/{}", temp_folder_name),
+        "node" => &format!("/tmp/{}", name),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",
     };
 
-    let res = fs::create_dir_all(format!("/tmp/{}", temp_folder_name));
+    let tmp_path = match command {
+        "java" | "maven" => &format!("/tmp/{}", temp_folder_name),
+        "node" => &format!("/tmp/{}", name),
+        _ => "",
+    };
+
+    let res = fs::create_dir_all(tmp_path);
+    println!("{}", output_path);
     match res {
         Ok(_) => {
             let tarball_status = run_command(
@@ -225,6 +252,28 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
                             String::from_utf8_lossy(&mv_status.stderr)
                         );
                     }
+                } else if command.eq("node") {
+                    // NOTE: extracted into /tmp/{version} and moving it in ~/.jvem/node_versions
+                    let mv_status = run_command(
+                        "sh",
+                        vec![
+                            "-c",
+                            &format!(
+                                "mv {} {}",
+                                tmp_path,
+                                &format!("{}/.jvem/node_versions/{}", get_home_dir(), name)
+                            ),
+                        ],
+                    );
+
+                    if mv_status.status.success() {
+                        println!("done moving files around...");
+                    } else {
+                        println!(
+                            "moving files failed: {:?}",
+                            String::from_utf8_lossy(&mv_status.stderr)
+                        );
+                    }
                 }
             } else {
                 println!(
@@ -241,7 +290,7 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
 
 pub fn extract_zip(temp_dir: &str, name: &str, command: &str) {
     let output_path = match command {
-        "java" => &get_installation_dir(name),
+        "java" => &get_installation_dir(name, "java"),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",
     };

@@ -9,13 +9,7 @@ use std::sync::{
 };
 
 use clap::{Parser, Subcommand, ValueEnum};
-use commands::{
-    java::{
-        clean::clean, current::current, deactivate::deactivate, install::install, ls::ls,
-        lsrem::lsrem, uninstall::uninstall, usev::usev,
-    },
-    maven, node,
-};
+use commands::{java, maven, node};
 use tokio::signal;
 
 #[derive(Parser, Debug)]
@@ -145,23 +139,14 @@ impl std::str::FromStr for MavenCommand {
 async fn handle_java_action(action: Option<Command>, param: Option<String>) {
     if let Some(action) = action {
         match action {
-            Command::Install => {
-                let jdk = param.unwrap();
-                install(jdk);
-            }
-            Command::Current => current(),
-            Command::Uninstall => {
-                let jdk = param.unwrap();
-                uninstall(jdk);
-            }
-            Command::Usev => {
-                let jdk = param.unwrap();
-                usev(jdk).await;
-            }
-            Command::Lsrem => lsrem(),
-            Command::Ls => ls(),
-            Command::Deactivate => deactivate(),
-            Command::Clean => clean(),
+            Command::Install => java::install::install(param.unwrap()),
+            Command::Current => java::current::current(),
+            Command::Uninstall => java::uninstall::uninstall(param.unwrap()),
+            Command::Usev => java::usev::usev(param.unwrap()).await,
+            Command::Lsrem => java::lsrem::lsrem(),
+            Command::Ls => java::ls::ls(),
+            Command::Deactivate => java::deactivate::deactivate(),
+            Command::Clean => java::clean::clean(),
         }
     } else {
         println!("enter valid action. for more details use --help or -h");
@@ -187,7 +172,9 @@ async fn handle_nodejs_action(action: Option<NodeCommand>, param: Option<String>
             NodeCommand::Clean => node::clean::clean(),
             NodeCommand::Current => node::current::current().await,
             NodeCommand::Deactivate => node::deactivate::deactivate(),
-            _ => println!("not implemented yet"),
+            NodeCommand::Install => node::install::install(param.unwrap()),
+            NodeCommand::Uninstall => node::uninstall::uninstall(param.unwrap()),
+            NodeCommand::Usev => node::usev::usev(param.unwrap()),
         }
     } else {
         println!("enter valid action, for more details use --help or -h");

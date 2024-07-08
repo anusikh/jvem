@@ -4,7 +4,7 @@ use crate::utils::file_utils::{
 
 #[cfg(target_os = "windows")]
 async fn usev_util(name: String) {
-    let java_path = get_installation_dir(&name);
+    let java_path = get_installation_dir(&name, "java");
 
     let java_home_future = tokio::spawn(async move {
         println!("setting JAVA_HOME...");
@@ -14,7 +14,7 @@ async fn usev_util(name: String) {
             vec![
                 "-Command",
                 &format!("[System.Environment]::SetEnvironmentVariable('JAVA_HOME','{}',[System.EnvironmentVariableTarget]::User)
-                ", get_installation_dir(&name))
+                ", get_installation_dir(&name, "java"))
             ],
         );
 
@@ -57,13 +57,18 @@ async fn usev_util(name: String) {
         }
     });
 
-    let _ = tokio::join!(alias_future, java_home_future);
+    let (alias_task, java_home_task) = tokio::join!(alias_future, java_home_future);
 
-    println!("set jdk version successfully");
+    match (alias_task, java_home_task) {
+        (Ok(alias_task), Ok(java_home_task)) => {
+            println!("set jdk version successfully");
+        }
+        _ => println!("something went wrong"),
+    }
 }
 
 #[cfg(target_os = "linux")]
-pub async fn usev_util(name: String) {
+async fn usev_util(name: String) {
     // remove the previously linked folder
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 
@@ -73,7 +78,7 @@ pub async fn usev_util(name: String) {
             "-c",
             &format!(
                 "ln --symbolic {} {}/.jvem/java",
-                get_installation_dir(&name),
+                get_installation_dir(&name, "java"),
                 get_home_dir()
             ),
         ],
@@ -87,18 +92,18 @@ pub async fn usev_util(name: String) {
 }
 
 #[cfg(target_os = "macos")]
-pub async fn usev_util(name: String) {
+async fn usev_util(name: String) {
     let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
 
     // check if Contents folder present inside extracted files (required for Graal VM support)
-    let con_path = format!("{}/Contents", get_installation_dir(&name));
+    let con_path = format!("{}/Contents", get_installation_dir(&name, "java"));
     let if_contents_exists = check_path_exists(&con_path);
     let final_path;
 
     if if_contents_exists == true {
-        final_path = format!("{}/Contents/Home", get_installation_dir(&name));
+        final_path = format!("{}/Contents/Home", get_installation_dir(&name, "java"));
     } else {
-        final_path = format!("{}/Home", get_installation_dir(&name));
+        final_path = format!("{}/Home", get_installation_dir(&name, "java"));
     };
 
     let output = run_command(
@@ -118,11 +123,7 @@ pub async fn usev_util(name: String) {
 
 pub async fn usev(name: String) {
     match check_jdk_exists(&name) {
-        true => {
-            usev_util(name).await;
-        }
-        false => {
-            println!("install the jdk first")
-        }
+        true => usev_util(name).await,
+        false => println!("install the jdk first"),
     }
 }

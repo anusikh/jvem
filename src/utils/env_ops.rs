@@ -38,7 +38,7 @@ pub fn get_download_link(
     }
 }
 
-pub fn read_versions_nodejs() -> Result<(), Box<dyn std::error::Error>> {
+pub fn read_versions_node() -> Result<(), Box<dyn std::error::Error>> {
     let output = run_command("curl", vec!["https://nodejs.org/dist/"]);
     let mut curr = 16;
     let mut display_vec = Vec::new();
@@ -62,7 +62,10 @@ pub fn read_versions_nodejs() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     } else {
-        println!("couldn't connect to nodejs.org: {}", String::from_utf8_lossy(&output.stderr));
+        println!(
+            "couldn't connect to nodejs.org: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
     }
 
     Ok(())
@@ -74,7 +77,7 @@ fn parse_version(line: &str) -> Option<&str> {
     line.get(start..end)
 }
 
-pub fn get_download_link_nodejs(version: &str, os: &str, arch: &str) {
+pub fn get_download_link_node(version: &str, os: &str, arch: &str) -> Result<String, Box<dyn std::error::Error>> {
     let os_mapped = match os {
         "windows" => "win",
         "macos" => "darwin",
@@ -94,16 +97,10 @@ pub fn get_download_link_nodejs(version: &str, os: &str, arch: &str) {
         _ => panic!("unsupported operating system"),
     };
 
-    let x: Vec<&str> = version.split(".").collect();
-
     let link = format!(
-        "https://nodejs.org/dist/latest-v{}.x/node-v{}-{}-{}.{}",
-        x.get(0).unwrap(),
-        version,
-        os_mapped,
-        arch_mapped,
-        format_mapped
+        "https://nodejs.org/dist/v{0}/node-v{0}-{1}-{2}.{3}",
+        version, os_mapped, arch_mapped, format_mapped
     );
 
-    println!("{}", link);
+    Ok(link)
 }

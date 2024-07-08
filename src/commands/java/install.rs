@@ -86,25 +86,32 @@ fn install_util(name: String, link: String) {
 
 #[cfg(target_os = "macos")]
 fn install_util(name: String, link: String) {
-    create_java_dir(&name);
+    match check_jdk_exists(&name) {
+        false => {
+            create_java_dir(&name);
 
-    let temp_directory = format!("/tmp/{}.tar.gz", name);
+            let temp_directory = format!("/tmp/{}.tar.gz", name);
 
-    if std::path::Path::new(&temp_directory).exists() {
-        println!("fetching tarball from cache successful");
-        extract_tarball_macos(&name, "java");
-    } else {
-        println!("fetching tarball...");
-        let output = run_command("/usr/bin/curl", vec!["-o", &temp_directory, &link]);
+            if std::path::Path::new(&temp_directory).exists() {
+                println!("fetching tarball from cache successful");
+                extract_tarball_macos(&name, "java");
+            } else {
+                println!("fetching tarball...");
+                let output = run_command("/usr/bin/curl", vec!["-o", &temp_directory, &link]);
 
-        if output.status.success() {
-            println!("fetching tarball successful ");
-            extract_tarball_macos(&name, "java");
-        } else {
-            println!(
-                "fetching tarball failed: {} ",
-                String::from_utf8_lossy(&output.stderr)
-            );
+                if output.status.success() {
+                    println!("fetching tarball successful ");
+                    extract_tarball_macos(&name, "java");
+                } else {
+                    println!(
+                        "fetching tarball failed: {} ",
+                        String::from_utf8_lossy(&output.stderr)
+                    );
+                }
+            }
+        }
+        true => {
+            println!("jdk already exists in fs, if it doesn't run the clean command");
         }
     }
 }
@@ -117,7 +124,7 @@ pub fn install(name: String) {
             install_util(name, x);
         }
         Err(e) => {
-            println!("{} ", e.to_string());
+            println!("{}", e.to_string());
         }
     }
 }

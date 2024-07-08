@@ -6,7 +6,7 @@ fn uninstall_util(name: &str) {
         "powershell",
         vec![
             "-Command",
-            &format!("rm -r {}", get_installation_dir(&name)),
+            &format!("rm -r {}", get_installation_dir(&name, "java")),
         ],
     );
     if output.status.success() {
@@ -20,7 +20,7 @@ fn uninstall_util(name: &str) {
 fn uninstall_util(name: &str) {
     let output = run_command(
         "rm",
-        vec!["-rf", &format!("{}", get_installation_dir(&name))],
+        vec!["-rf", &format!("{}", get_installation_dir(&name, "java"))],
     );
     if output.status.success() {
         println!("uninstall successful ");
@@ -33,7 +33,7 @@ fn uninstall_util(name: &str) {
 fn uninstall_util(name: &str) {
     let output = run_command(
         "rm",
-        vec!["-rf", &format!("{}", get_installation_dir(&name))],
+        vec!["-rf", &format!("{}", get_installation_dir(&name, "java"))],
     );
     if output.status.success() {
         println!("uninstall successful ");
