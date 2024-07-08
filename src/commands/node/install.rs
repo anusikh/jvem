@@ -1,6 +1,16 @@
 use crate::utils::env_ops::get_download_link_node;
 use crate::utils::file_utils::{create_node_dir, extract_tarball_macos, run_command};
 
+#[cfg(target_os = "linux")]
+fn install_util(version: String, link: String) {
+    println!("not implemented yet");
+}
+
+#[cfg(target_os = "windows")]
+fn install_util(version: String, link: String) {
+    println!("not implemented yet");
+}
+
 #[cfg(target_os = "macos")]
 fn install_util(version: String, link: String) {
     create_node_dir();
