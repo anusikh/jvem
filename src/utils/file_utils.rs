@@ -300,7 +300,7 @@ pub fn extract_zip(temp_dir: &str, name: &str, command: &str) {
         vec![
             "-Command",
             &format!(
-                "$ProgressPreference = 'SilentlyContinue';Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1};$ProgressPreference = 'Continue'",
+                "Set-Variable ProgressPreference = 'SilentlyContinue';Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1};",
                 temp_dir, output_path,
             ),
         ],

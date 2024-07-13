@@ -31,30 +31,15 @@ async fn usev_util(name: String) {
     let alias_future = tokio::spawn(async move {
         println!("creating symlink...");
 
-        // remove the previously linked folder
-        let _ = run_command(
-            "powershell",
-            vec![
-                "-Command",
-                &format!("rm -r {}\\.jvem\\java", get_home_dir()),
-            ],
-        );
-        let output = run_command(
-            "powershell",
-            vec![
-                "-Command",
-                &format!(
-                    "New-Item -Path {}\\.jvem\\java -ItemType Junction -Value {}",
-                    get_home_dir(),
-                    java_path
-                ),
-            ],
-        );
-        if output.status.success() {
-            println!("done!");
-        } else {
-            println!("failed: {}", String::from_utf8_lossy(&output.stderr));
-        }
+        let _ = std::fs::remove_dir_all(&format!("{}/.jvem/java", get_home_dir()));
+
+        let res =
+            std::os::windows::fs::symlink_file(java_path, format!("{}/.jvem/java", get_home_dir()));
+
+        match res {
+            Ok(_) => println!("set jdk version successfully"),
+            Err(e) => println!("failed: {}", e.to_string()),
+        };
     });
 
     let (alias_task, java_home_task) = tokio::join!(alias_future, java_home_future);
@@ -70,30 +55,22 @@ async fn usev_util(name: String) {
 #[cfg(target_os = "linux")]
 async fn usev_util(name: String) {
     // remove the previously linked folder
-    let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
+    let _ = std::fs::remove_dir_all(&format!("{}/.jvem/java", get_home_dir()));
 
-    let output = run_command(
-        "sh",
-        vec![
-            "-c",
-            &format!(
-                "ln --symbolic {} {}/.jvem/java",
-                get_installation_dir(&name, "java"),
-                get_home_dir()
-            ),
-        ],
+    let res = std::os::unix::fs::symlink(
+        get_installation_dir(&name, "java"),
+        format!("{}/.jvem/java", get_home_dir()),
     );
 
-    if output.status.success() {
-        println!("set jdk version successfully");
-    } else {
-        println!("failed: {}", String::from_utf8_lossy(&output.stderr))
-    }
+    match res {
+        Ok(_) => println!("set jdk version successfully"),
+        Err(e) => println!("failed: {}", e.to_string()),
+    };
 }
 
 #[cfg(target_os = "macos")]
 async fn usev_util(name: String) {
-    let _ = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
+    let _ = std::fs::remove_dir_all(&format!("{}/.jvem/java", get_home_dir()));
 
     // check if Contents folder present inside extracted files (required for Graal VM support)
     let con_path = format!("{}/Contents", get_installation_dir(&name, "java"));
@@ -106,19 +83,12 @@ async fn usev_util(name: String) {
         final_path = format!("{}/Home", get_installation_dir(&name, "java"));
     };
 
-    let output = run_command(
-        "sh",
-        vec![
-            "-c",
-            &format!("ln -s {} {}/.jvem/java", final_path, get_home_dir()),
-        ],
-    );
+    let res = std::os::unix::fs::symlink(final_path, format!("{}/.jvem/java", get_home_dir()));
 
-    if output.status.success() {
-        println!("set jdk version successfully");
-    } else {
-        println!("failed: {}", String::from_utf8_lossy(&output.stderr))
-    }
+    match res {
+        Ok(_) => println!("set jdk version successfully"),
+        Err(e) => println!("failed: {}", e.to_string()),
+    };
 }
 
 pub async fn usev(name: String) {
