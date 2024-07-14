@@ -7,7 +7,7 @@ use crate::utils::file_utils::{
 fn install_util(version: String, link: String) {
     match check_node_exists(&version) {
         false => {
-            println!(link);
+            println!("{}", link);
         }
         true => {
             println!("node version exists already, if it doesn't run the clean command")
@@ -19,7 +19,7 @@ fn install_util(version: String, link: String) {
 fn install_util(version: String, link: String) {
     match check_node_exists(&version) {
         false => {
-            println!(link);
+            println!("{}", link);
         }
         true => {
             println!("node version exists already, if it doesn't run the clean command")
