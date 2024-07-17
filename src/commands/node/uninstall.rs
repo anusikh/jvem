@@ -16,23 +16,7 @@ fn uninstall_util(version: &str) {
     }
 }
 
-#[cfg(target_os = "linux")]
-fn uninstall_util(version: &str) {
-    let output = run_command(
-        "rm",
-        vec![
-            "-rf",
-            &format!("{}", get_installation_dir(&version, "node")),
-        ],
-    );
-    if output.status.success() {
-        println!("uninstall successful ");
-    } else {
-        println!("uninstall failed: maybe the mentioned node version is not installed locally");
-    }
-}
-
-#[cfg(target_os = "macos")]
+#[cfg(unix)]
 fn uninstall_util(version: &str) {
     let output = run_command(
         "rm",

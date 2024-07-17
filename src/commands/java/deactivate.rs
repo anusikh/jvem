@@ -16,17 +16,7 @@ fn deactivate_util() {
     }
 }
 
-#[cfg(target_os = "linux")]
-fn deactivate_util() {
-    let output = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
-    if output.status.success() {
-        println!("deactivation successful ");
-    } else {
-        println!("deactivation failed");
-    }
-}
-
-#[cfg(target_os = "macos")]
+#[cfg(unix)]
 fn deactivate_util() {
     let output = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
     if output.status.success() {
