@@ -6,7 +6,7 @@ pub fn read_versions() -> Result<(), Box<dyn std::error::Error>> {
     let available_versions = constants::AVAILABLE_VERSIONS;
     let versions: Vec<&str> = available_versions.split(',').collect();
 
-    println!("Availaible Versions:");
+    println!("available versions:");
     for version in versions {
         println!("{}", version.to_ascii_lowercase());
     }
@@ -42,10 +42,12 @@ pub fn read_versions_node() -> Result<(), Box<dyn std::error::Error>> {
     let output = run_command("curl", vec!["https://nodejs.org/dist/"]);
     let mut curr = 16;
     let mut display_vec = Vec::new();
+
+    println!("available versions:");
     if output.status.success() {
         let body = String::from_utf8_lossy(&output.stdout);
         for line in body.lines() {
-            if line.contains(">v") && line.contains("/<") {
+            if line.contains("<a href=\"v") {
                 if let Some(version) = parse_version(&line) {
                     let num_ver: u32 = version.split('.').next().unwrap().parse().unwrap();
                     // NOTE: We are supporting versions above 16
@@ -61,6 +63,11 @@ pub fn read_versions_node() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
+
+        if !display_vec.is_empty() {
+            println!("nodejs v{}", curr.to_string());
+            println!("{:?}", display_vec);
+        }
     } else {
         println!(
             "couldn't connect to nodejs.org: {}",
@@ -72,12 +79,16 @@ pub fn read_versions_node() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn parse_version(line: &str) -> Option<&str> {
-    let start = line.find(">v")? + 2;
-    let end = line.find("/<")?;
+    let start = line.find("v")? + 1;
+    let end = line.find("/\">")?;
     line.get(start..end)
 }
 
-pub fn get_download_link_node(version: &str, os: &str, arch: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_download_link_node(
+    version: &str,
+    os: &str,
+    arch: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
     let os_mapped = match os {
         "windows" => "win",
         "macos" => "darwin",

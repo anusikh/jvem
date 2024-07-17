@@ -99,8 +99,8 @@ pub fn create_maven_dir() {
     fs::create_dir_all(new_dir).unwrap();
 }
 
-pub fn create_node_dir() {
-    let new_dir = format!("{}/.jvem/node_versions", *HOME_DIR);
+pub fn create_node_dir(name: &str) {
+    let new_dir = format!("{}/.jvem/node_versions/{}", *HOME_DIR, name);
     fs::create_dir_all(new_dir).unwrap();
 }
 
@@ -163,7 +163,7 @@ pub fn clean_jvem(command: &str) {
 
 pub fn extract_tarball_linux(name: &str, command: &str) {
     let tar_location = match command {
-        "java" => &find_file_in_dir("/tmp", name),
+        "java" | "node" => &find_file_in_dir("/tmp", name),
         "maven" => "/tmp/maven.tar.gz",
         _ => "",
     };
@@ -171,6 +171,11 @@ pub fn extract_tarball_linux(name: &str, command: &str) {
     let ext_location = match command {
         "java" => &format!(
             "{}/.jvem/java_versions/{}",
+            get_home_dir(),
+            String::from(name)
+        ),
+        "node" => &format!(
+            "{}/.jvem/node_versions/{}",
             get_home_dir(),
             String::from(name)
         ),
@@ -221,7 +226,6 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
     };
 
     let res = fs::create_dir_all(tmp_path);
-    println!("{}", output_path);
     match res {
         Ok(_) => {
             let tarball_status = run_command(
