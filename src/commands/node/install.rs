@@ -1,13 +1,46 @@
 use crate::utils::env_ops::get_download_link_node;
 use crate::utils::file_utils::{
-    check_node_exists, create_node_dir, extract_tarball_linux, extract_tarball_macos, run_command,
+    check_node_exists, create_node_dir, extract_tarball_linux, extract_tarball_macos, extract_zip,
+    get_home_dir, run_command,
 };
 
 #[cfg(target_os = "windows")]
 fn install_util(version: String, link: String) {
     match check_node_exists(&version) {
         false => {
-            println!("{}", link);
+            create_node_dir(&version);
+
+            let temp_directory = format!("{}/AppData/Local/Temp/{}.zip", get_home_dir(), version);
+
+            if std::path::Path::new(&temp_directory).exists() {
+                println!("fetching tarball from cache successful");
+                extract_zip(&temp_directory, &version, "node");
+            } else {
+                println!("fetching zip...");
+
+                let output = run_command(
+                    "powershell",
+                    vec![
+                        "-Command",
+                        "Set-Variable ProgressPreference SilentlyContinue ;",
+                        "Invoke-WebRequest",
+                        "-outf",
+                        &temp_directory,
+                        "-Uri",
+                        &link,
+                    ],
+                );
+
+                if output.status.success() {
+                    println!("fetching zip successful ");
+                    extract_zip(&temp_directory, &version, "node");
+                } else {
+                    println!(
+                        "fetching zip failed: {} ",
+                        String::from_utf8_lossy(&output.stderr)
+                    );
+                }
+            }
         }
         true => {
             println!("node version exists already, if it doesn't run the clean command")

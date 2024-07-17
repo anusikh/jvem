@@ -31,15 +31,26 @@ async fn usev_util(name: String) {
     let alias_future = tokio::spawn(async move {
         println!("creating symlink...");
 
+        // remove previous symlink
         let _ = std::fs::remove_dir_all(&format!("{}/.jvem/java", get_home_dir()));
 
-        let res =
-            std::os::windows::fs::symlink_file(java_path, format!("{}/.jvem/java", get_home_dir()));
+        let res = run_command(
+            "powershell",
+            vec![
+                "-Command",
+                &format!(
+                    "New-Item -Path {}\\.jvem\\java -ItemType Junction -Value {}",
+                    get_home_dir(),
+                    java_path
+                ),
+            ],
+        );
 
-        match res {
-            Ok(_) => println!("set jdk version successfully"),
-            Err(e) => println!("failed: {}", e.to_string()),
-        };
+        if res.status.success() {
+            println!("done!");
+        } else {
+            println!("failed: {}", String::from_utf8_lossy(&res.stderr));
+        }
     });
 
     let (alias_task, java_home_task) = tokio::join!(alias_future, java_home_future);

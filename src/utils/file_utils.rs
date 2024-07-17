@@ -295,6 +295,7 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
 pub fn extract_zip(temp_dir: &str, name: &str, command: &str) {
     let output_path = match command {
         "java" => &get_installation_dir(name, "java"),
+        "node" => &get_installation_dir(name, "node"),
         "maven" => &format!("{}/.jvem/maven", get_home_dir()),
         _ => "",
     };
