@@ -1,4 +1,6 @@
-use crate::utils::file_utils::{check_node_exists, get_home_dir, run_command, get_installation_dir};
+use crate::utils::file_utils::{
+    check_node_exists, get_home_dir, get_installation_dir, run_command,
+};
 
 #[cfg(target_os = "windows")]
 fn usev_util(version: String) {
@@ -11,7 +13,11 @@ fn usev_util(version: String) {
         "powershell",
         vec![
             "-Command",
-            &format!("New-Item -Path {}\\.jvem\\node -ItemType Junction -Value {}", get_home_dir(), node_path),
+            &format!(
+                "New-Item -Path {}\\.jvem\\node -ItemType Junction -Value {}",
+                get_home_dir(),
+                node_path
+            ),
         ],
     );
 

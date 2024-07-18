@@ -265,7 +265,7 @@ pub fn extract_tarball_macos(name: &str, command: &str) {
                             &format!(
                                 "mv {} {}",
                                 tmp_path,
-                                &format!("{}/.jvem/node_versions/{}", get_home_dir(), name)
+                                &format!("{}/.jvem/node_versions", get_home_dir())
                             ),
                         ],
                     );
