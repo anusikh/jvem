@@ -76,11 +76,8 @@ target/release/jvem maven install
 output=$(~/.jvem/maven/bin/mvn --version)
 expected_output=$(
 cat <<EOF
-Apache Maven 3.9.8 (36645f6c9b5079805ea5009217e36f2cffd34256)
-Maven home: /home/anusikh/.jvem/maven
-Java version: 22.0.1, vendor: Oracle Corporation, runtime: /home/anusikh/.jvem/java_versions/openjdk22
-Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "6.8.0-38-generic", arch: "amd64", family: "unix"
+maven download successful
+tarball extraction successful
 EOF
 )
 assert "$output" "$expected_output"

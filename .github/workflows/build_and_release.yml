@@ -39,7 +39,7 @@ jobs:
         run: |
           cargo build --all --release
           bash src/tests/test.sh
-      - name: build
+      - name: package
         run: |
           mv target/release/jvem target/release/jvem_amd64
           mkdir source
