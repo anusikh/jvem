@@ -11,6 +11,16 @@ assert() {
   fi
 }
 
+starts_with() {
+  local output="$1"
+  local start="$2"
+  if [[ $output =~ ^"$start" ]]; then
+    echo "[passed]"
+  else
+    echo "[failed]"
+  fi
+}
+
 # node version management test
 echo "node version management tests....."
 target/release/jvem node install 21.7.3
@@ -74,13 +84,8 @@ assert "$output" "$expected_output"
 echo "node version management tests....."
 target/release/jvem maven install
 output=$(~/.jvem/maven/bin/mvn --version)
-expected_output=$(
-cat <<EOF
-maven download successful
-tarball extraction successful
-EOF
-)
-assert "$output" "$expected_output"
+start="Apache Maven 3.9.8"
+starts_with "$output" "$start"
 
 output=$(target/release/jvem maven uninstall)
 expected_output="maven uninstall successful"
