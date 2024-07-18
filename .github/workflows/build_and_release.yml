@@ -33,11 +33,14 @@ jobs:
     needs: common-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v2
-      - name: build
+      - name: build and test
         run: |
           cargo build --all --release
+          bash src/tests/test.sh
+      - name: build
+        run: |
           mv target/release/jvem target/release/jvem_amd64
           mkdir source
           mv target/release/jvem_amd64 source/
@@ -52,7 +55,7 @@ jobs:
     needs: common-build
     runs-on: windows-latest
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v2
       - name: build
         run: |
@@ -70,7 +73,7 @@ jobs:
     needs: common-build
     runs-on: macos-latest
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v2
       - name: build
         run: |
@@ -78,7 +81,7 @@ jobs:
           mkdir source
           mv target/release/jvem source/
           tar -czvf ${{ env.MACOS_ARTIFACT }} -C source/ .
-      - name: Upload Artifact
+      - name: upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
@@ -88,19 +91,19 @@ jobs:
     needs: [build-linux, build-win, build-macos]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v2
-      - name: Download Linux Artifact
+      - name: download Linux Artifact
         uses: actions/download-artifact@v2
         with:
           name: linux-artifact
           path: .
-      - name: Download Windows Artifact
+      - name: download Windows Artifact
         uses: actions/download-artifact@v2
         with:
           name: windows-artifact
           path: .
-      - name: Download macOS Artifact
+      - name: download macOS Artifact
         uses: actions/download-artifact@v2
         with:
           name: macos-artifact
