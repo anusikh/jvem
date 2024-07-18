@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# setting environment variables
-export PATH=$M2_HOME/bin:$PATH
-export PATH=$PATH:$HOME/.jvem/java/bin
-export PATH=$PATH:$HOME/.jvem/node/bin
-
 assert() {
   local output="$1"
   local expected_output="$2"
@@ -30,12 +25,12 @@ EOF
 assert "$output" "$expected_output"
 
 target/release/jvem node usev 21.7.3
-output=$(node -v)
+output=$(~/.jvem/node/bin/node -v)
 expected_output="v21.7.3"
 assert "$output" "$expected_output"
 
 target/release/jvem node usev 22.5.0
-output=$(node -v)
+output=$(~/.jvem/node/bin/node -v)
 expected_output="v22.5.0"
 assert "$output" "$expected_output"
 
@@ -48,13 +43,12 @@ EOF
 )
 assert "$output" "$expected_output"
 
-
 # java version management test
 echo "java version management tests....."
 target/release/jvem java install openjdk22
 target/release/jvem java install openjdk17
 target/release/jvem java usev openjdk17
-output=$(java --version)
+output=$(~/.jvem/java/bin/java --version)
 expected_output=$(
 cat <<EOF
 openjdk 17.0.2 2022-01-18
@@ -65,7 +59,7 @@ EOF
 assert "$output" "$expected_output"
 
 target/release/jvem java usev openjdk22
-output=$(java --version)
+output=$(~/.jvem/java/bin/java --version)
 expected_output=$(
 cat <<EOF
 openjdk 22.0.1 2024-04-16
@@ -79,7 +73,7 @@ assert "$output" "$expected_output"
 # maven version management
 echo "node version management tests....."
 target/release/jvem maven install
-output=$(mvn --version)
+output=$(~/.jvem/maven/bin/mvn --version)
 expected_output=$(
 cat <<EOF
 Apache Maven 3.9.8 (36645f6c9b5079805ea5009217e36f2cffd34256)
