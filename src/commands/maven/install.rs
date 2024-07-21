@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 
 use crate::utils::file_utils::{
     check_maven_exists, create_maven_dir, extract_tarball_linux, extract_tarball_macos,
-    find_file_in_dir, get_home_dir, run_command,
+    extract_zip, find_file_in_dir, get_home_dir, run_command,
 };
 
 lazy_static! {
@@ -16,8 +16,6 @@ lazy_static! {
 
 #[cfg(target_os = "windows")]
 fn install_util() {
-    use crate::utils::file_utils::extract_zip;
-
     match check_maven_exists() {
         false => {
             create_maven_dir();
