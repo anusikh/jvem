@@ -48,13 +48,35 @@ pub fn get_home_dir() -> String {
     res.to_string()
 }
 
-pub fn get_installation_dir(name: &str) -> String {
-    format!("{}/.jvem/{}", get_home_dir(), name)
+pub fn get_installation_dir(name: &str, command: &str) -> String {
+    let res = match command {
+        "java" => &format!("{}/.jvem/java_versions/{}", get_home_dir(), name),
+        "node" => &format!("{}/.jvem/node_versions/{}", get_home_dir(), name),
+        "maven" => &format!("{}/.jvem/maven/bin", get_home_dir()),
+        _ => "",
+    };
+    String::from(res)
 }
 
 pub fn check_jdk_exists(name: &str) -> bool {
-    let d_path = get_installation_dir(name);
+    let d_path = get_installation_dir(name, "java");
     match Path::new(&d_path).exists() {
+        true => true,
+        false => false,
+    }
+}
+
+pub fn check_maven_exists() -> bool {
+    let m_path = get_installation_dir("", "maven");
+    match Path::new(&m_path).exists() {
+        true => true,
+        false => false,
+    }
+}
+
+pub fn check_node_exists(version: &str) -> bool {
+    let n_path = get_installation_dir(version, "node");
+    match Path::new(&n_path).exists() {
         true => true,
         false => false,
     }
@@ -68,25 +90,51 @@ pub fn check_path_exists(path: &str) -> bool {
 }
 
 pub fn create_java_dir(name: &str) {
-    let new_dir_path = format!("{}/.jvem/{}", *HOME_DIR, name);
+    let new_dir_path = format!("{}/.jvem/java_versions/{}", *HOME_DIR, name);
     fs::create_dir_all(new_dir_path).unwrap();
 }
 
-pub fn check_list_locally() {
-    let jvem_dir = format!("{}/.jvem/", get_home_dir());
-    let path_dir = Path::new(&jvem_dir);
-    match path_dir.exists() {
-        true => {
-            for entry in fs::read_dir(path_dir).unwrap() {
-                let entry = entry.unwrap();
-                // .DS_Store is macos specific
-                if entry.file_name() != "java" && entry.file_name() != ".DS_Store" {
-                    println!("{}", entry.file_name().to_str().unwrap());
+pub fn create_maven_dir() {
+    let new_dir = format!("{}/.jvem/maven", *HOME_DIR);
+    fs::create_dir_all(new_dir).unwrap();
+}
+
+pub fn create_node_dir(name: &str) {
+    let new_dir = format!("{}/.jvem/node_versions/{}", *HOME_DIR, name);
+    fs::create_dir_all(new_dir).unwrap();
+}
+
+pub fn check_list_locally(command: &str) {
+    let dir = match command {
+        "java" => "java_versions",
+        "node" => "node_versions",
+        _ => "",
+    };
+    if !dir.is_empty() {
+        let jvem_dir = format!("{}/.jvem/{}/", get_home_dir(), dir);
+        let path_dir = Path::new(&jvem_dir);
+        match path_dir.exists() {
+            true => {
+                let mut res: Vec<String> = Vec::new();
+
+                for entry in fs::read_dir(path_dir).unwrap() {
+                    let entry = entry.unwrap();
+                    // .DS_Store is macos specific
+                    if entry.file_name() != ".DS_Store" {
+                        res.push(String::from(entry.file_name().to_str().unwrap()));
+                    }
+                }
+                if res.len() > 0 {
+                    for item in res {
+                        println!("{}", item);
+                    }
+                } else {
+                    println!("no installations found locally");
                 }
             }
-        }
-        false => {
-            println!("{}", "no jdk installations found locally");
+            false => {
+                println!("no installations found locally");
+            }
         }
     }
 }
@@ -95,31 +143,59 @@ pub fn is_empty_dir(path: &std::path::Path) -> io::Result<bool> {
     Ok(fs::read_dir(path)?.next().is_none())
 }
 
-pub fn clean_jvem() {
-    for entry in fs::read_dir(format!("{}/.jvem", get_home_dir())).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
+pub fn clean_jvem(command: &str) {
+    let dir = match command {
+        "java" => "java_versions",
+        "node" => "node_versions",
+        _ => "",
+    };
+    if !dir.is_empty() {
+        for entry in fs::read_dir(format!("{}/.jvem/{}", get_home_dir(), dir)).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
 
-        if path.is_dir() && is_empty_dir(&path).unwrap() {
-            fs::remove_dir(&path).unwrap();
+            if path.is_dir() && is_empty_dir(&path).unwrap() {
+                fs::remove_dir(&path).unwrap();
+            }
         }
     }
 }
 
-pub fn extract_tarball_linux(name: String) {
+pub fn extract_tarball_linux(name: &str, command: &str) {
+    let tar_location = match command {
+        "java" | "node" => &find_file_in_dir("/tmp", name),
+        "maven" => "/tmp/maven.tar.gz",
+        _ => "",
+    };
+
+    let ext_location = match command {
+        "java" => &format!(
+            "{}/.jvem/java_versions/{}",
+            get_home_dir(),
+            String::from(name)
+        ),
+        "node" => &format!(
+            "{}/.jvem/node_versions/{}",
+            get_home_dir(),
+            String::from(name)
+        ),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
     let tarball_status = run_command(
         "/usr/bin/tar",
         vec![
             "xvzf",
-            &find_file_in_dir("/tmp/", &name),
+            tar_location,
             "--strip-components=1",
             "-C",
-            &format!("{}/.jvem/{}", get_home_dir(), name),
+            ext_location,
         ],
     );
 
     if tarball_status.status.success() {
-        println!("tarball extraction successful ");
+        println!("tarball extraction successful");
     } else {
         println!(
             "tarball extraction failed: {:?} ",
@@ -128,44 +204,80 @@ pub fn extract_tarball_linux(name: String) {
     }
 }
 
-pub fn extract_tarball_macos(name: &str) {
+pub fn extract_tarball_macos(name: &str, command: &str) {
     let temp_folder_name = format!("{}", rand::thread_rng().gen::<u32>());
-    let res = fs::create_dir_all(format!("/tmp/{}", temp_folder_name));
+    let tar_path = match command {
+        "java" | "node" => &find_file_in_dir("/tmp/", &name),
+        "maven" => "/tmp/maven.tar.gz",
+        _ => "",
+    };
+
+    let output_path = match command {
+        "java" => &format!("/tmp/{}", temp_folder_name),
+        "node" => &format!("/tmp/{}", name),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
+    let tmp_path = match command {
+        "java" | "maven" => &format!("/tmp/{}", temp_folder_name),
+        "node" => &format!("/tmp/{}", name),
+        _ => "",
+    };
+
+    let res = fs::create_dir_all(tmp_path);
     match res {
         Ok(_) => {
             let tarball_status = run_command(
                 "/usr/bin/tar",
-                vec![
-                    "xvzf",
-                    &find_file_in_dir("/tmp/", &name),
-                    "--strip-components=1",
-                    "-C",
-                    &format!("/tmp/{}", temp_folder_name),
-                ],
+                vec!["xvzf", tar_path, "--strip-components=1", "-C", output_path],
             );
 
             if tarball_status.status.success() {
                 println!("tarball extraction successful, trying to move some files around...");
-                let mv_status = run_command(
-                    "sh",
-                    vec![
-                        "-c",
-                        &format!(
-                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}/.jvem/{}",
+                if command.eq("java") {
+                    let mv_status = run_command(
+                        "sh",
+                        vec![
+                            "-c",
+                            &format!(
+                            "mv $(find /tmp/{} -mindepth 1 -maxdepth 1 -type d | head -n 1)/* {}",
                             temp_folder_name,
-                            get_home_dir(),
-                            name
-                        )
-                    ],
-                );
-
-                if mv_status.status.success() {
-                    println!("done moving files around...");
-                } else {
-                    println!(
-                        "moving files failed: {:?} ",
-                        String::from_utf8_lossy(&mv_status.stderr)
+                            &format!("{}/.jvem/java_versions/{}", get_home_dir(), name)
+                        ),
+                        ],
                     );
+
+                    if mv_status.status.success() {
+                        println!("done moving files around...");
+                    } else {
+                        println!(
+                            "moving files failed: {:?} ",
+                            String::from_utf8_lossy(&mv_status.stderr)
+                        );
+                    }
+                } else if command.eq("node") {
+                    // NOTE: extracted into /tmp/{version} and moving it in ~/.jvem/node_versions
+                    let mv_status = run_command(
+                        "sh",
+                        vec![
+                            "-c",
+                            &format!(
+                                "mv {} {}",
+                                tmp_path,
+                                &format!("{}/.jvem/node_versions", get_home_dir())
+                            ),
+                        ],
+                    );
+
+                    if mv_status.status.success() {
+                        println!("done moving files around...");
+                    } else {
+                        println!(
+                            "moving files failed: {:?}",
+                            String::from_utf8_lossy(&mv_status.stderr)
+                        );
+                    }
                 }
             } else {
                 println!(
@@ -180,15 +292,21 @@ pub fn extract_tarball_macos(name: &str) {
     }
 }
 
-pub fn extract_zip(temp_dir: &str, name: &str) {
+pub fn extract_zip(temp_dir: &str, name: &str, command: &str) {
+    let output_path = match command {
+        "java" => &get_installation_dir(name, "java"),
+        "node" => &get_installation_dir(name, "node"),
+        "maven" => &format!("{}/.jvem/maven", get_home_dir()),
+        _ => "",
+    };
+
     let unzip_output = run_command(
         "powershell",
         vec![
             "-Command",
             &format!(
-                "Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1}",
-                temp_dir,
-                get_installation_dir(name),
+                "Set-Variable ProgressPreference = 'SilentlyContinue';Expand-Archive -Path {0} -DestinationPath {1}; mv {1}\\*\\* {1};",
+                temp_dir, output_path,
             ),
         ],
     );

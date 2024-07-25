@@ -6,7 +6,7 @@ fn uninstall_util(name: &str) {
         "powershell",
         vec![
             "-Command",
-            &format!("rm -r {}", get_installation_dir(&name)),
+            &format!("rm -r {}", get_installation_dir(&name, "java")),
         ],
     );
     if output.status.success() {
@@ -16,26 +16,11 @@ fn uninstall_util(name: &str) {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(unix)]
 fn uninstall_util(name: &str) {
     let output = run_command(
         "rm",
-        vec!["-rf", &format!("{}", get_installation_dir(&name))],
-    );
-    if output.status.success() {
-        println!("uninstall successful ");
-    } else {
-        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
-    }
-}
-
-#[cfg(target_os = "macos")]
-fn uninstall_util(name: &str) {
-    // ToDo
-
-    let output = run_command(
-        "rm",
-        vec!["-rf", &format!("{}", get_installation_dir(&name))],
+        vec!["-rf", &format!("{}", get_installation_dir(&name, "java"))],
     );
     if output.status.success() {
         println!("uninstall successful ");
