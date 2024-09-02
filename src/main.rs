@@ -137,19 +137,19 @@ impl std::str::FromStr for MavenCommand {
 }
 
 async fn handle_java_action(action: Option<Command>, param: Option<String>) {
-    if let Some(action) = action {
+    if let Some((action, param)) = action.zip(param) {
         match action {
-            Command::Install => java::install::install(param.unwrap()),
+            Command::Install => java::install::install(param),
             Command::Current => java::current::current(),
-            Command::Uninstall => java::uninstall::uninstall(param.unwrap()),
-            Command::Usev => java::usev::usev(param.unwrap()).await,
+            Command::Uninstall => java::uninstall::uninstall(param),
+            Command::Usev => java::usev::usev(param).await,
             Command::Lsrem => java::lsrem::lsrem(),
             Command::Ls => java::ls::ls(),
             Command::Deactivate => java::deactivate::deactivate(),
             Command::Clean => java::clean::clean(),
         }
     } else {
-        println!("enter valid action. for more details use --help or -h");
+        println!("enter valid action or valid param. for more details use --help or -h");
     }
 }
 
@@ -165,19 +165,19 @@ async fn handle_maven_action(action: Option<MavenCommand>) {
 }
 
 async fn handle_nodejs_action(action: Option<NodeCommand>, param: Option<String>) {
-    if let Some(action) = action {
+    if let Some((action, param)) = action.zip(param) {
         match action {
             NodeCommand::Lsrem => node::lsrem::lsrem(),
             NodeCommand::Ls => node::ls::ls(),
             NodeCommand::Clean => node::clean::clean(),
             NodeCommand::Current => node::current::current().await,
             NodeCommand::Deactivate => node::deactivate::deactivate(),
-            NodeCommand::Install => node::install::install(param.unwrap()),
-            NodeCommand::Uninstall => node::uninstall::uninstall(param.unwrap()),
-            NodeCommand::Usev => node::usev::usev(param.unwrap()),
+            NodeCommand::Install => node::install::install(param),
+            NodeCommand::Uninstall => node::uninstall::uninstall(param),
+            NodeCommand::Usev => node::usev::usev(param),
         }
     } else {
-        println!("enter valid action, for more details use --help or -h");
+        println!("enter valid action or valid param, for more details use --help or -h");
     }
 }
 
