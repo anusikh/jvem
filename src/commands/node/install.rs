@@ -1,4 +1,4 @@
-use crate::utils::env_ops::get_download_link_node;
+use crate::utils::env_ops::{check_valid_node_version, get_download_link_node};
 use crate::utils::file_utils::{
     check_node_exists, create_node_dir, extract_tarball_linux, extract_tarball_macos, extract_zip,
     get_home_dir, run_command,
@@ -114,8 +114,11 @@ fn install_util(version: String, link: String) {
 
 pub fn install(version: String) {
     let link = get_download_link_node(&version, std::env::consts::OS, std::env::consts::ARCH);
-    match link {
-        Ok(l) => install_util(version, l),
+    match check_valid_node_version(&version) {
+        Ok(_) => match link {
+            Ok(l) => install_util(version, l),
+            Err(e) => println!("{}", e.to_string()),
+        },
         Err(e) => println!("{}", e.to_string()),
     }
 }
