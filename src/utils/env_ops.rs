@@ -78,6 +78,23 @@ pub fn read_versions_node() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+pub fn check_valid_node_version(version: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let output = run_command(
+        "curl",
+        vec![&format!("https://nodejs.org/dist/v{0}/", version)],
+    );
+    if output.status.success() {
+        let body = String::from_utf8_lossy(&output.stdout);
+        if !body.contains("404 Not Found") {
+            Ok(())
+        } else {
+            Err("no such node version exists".into())
+        }
+    } else {
+        Err("couldn't connect to nodejs.org".into())
+    }
+}
+
 fn parse_version(line: &str) -> Option<&str> {
     let start = line.find("v")? + 1;
     let end = line.find("/\">")?;

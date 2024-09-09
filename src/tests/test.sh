@@ -28,8 +28,8 @@ target/release/jvem node install 22.5.0
 output=$(target/release/jvem node ls)
 expected_output=$(
 cat <<EOF
-22.5.0
 21.7.3
+22.5.0
 EOF
 )
 assert "$output" "$expected_output"
