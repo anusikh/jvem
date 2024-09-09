@@ -61,7 +61,7 @@ target/release/jvem java usev openjdk17
 output=$(~/.jvem/java/bin/java --version)
 expected_output=$(
 cat <<EOF
-java version: openjdk 17.0.2 2022-01-18
+openjdk 17.0.2 2022-01-18
 OpenJDK Runtime Environment (build 17.0.2+8-86)
 OpenJDK 64-Bit Server VM (build 17.0.2+8-86, mixed mode, sharing)
 EOF
@@ -72,7 +72,7 @@ target/release/jvem java usev openjdk22
 output=$(~/.jvem/java/bin/java --version)
 expected_output=$(
 cat <<EOF
-java version: openjdk 22.0.1 2024-04-16
+openjdk 22.0.1 2024-04-16
 OpenJDK Runtime Environment (build 22.0.1+8-16)
 OpenJDK 64-Bit Server VM (build 22.0.1+8-16, mixed mode, sharing)
 EOF
