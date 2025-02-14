@@ -2,7 +2,7 @@ pub mod constants {
     pub const LINUX_ARTIFACT: &str = "jvem.tar.gz";
     pub const WINDOWS_ARTIFACT: &str = "jvem.zip";
     pub const AVAILABLE_VERSIONS: &str =
-        "ZULU8,ZULU11,ZULU17,ZULU21,ZULU22,OPENJDK11,OPENJDK17,OPENJDK21,OPENJDK22,GRAAL17,GRAAL21,GRAAL22";
+        "ZULU8,ZULU11,ZULU17,ZULU21,ZULU22,OPENJDK11,OPENJDK17,OPENJDK21,OPENJDK22,GRAAL21,GRAAL22";
 
     // zulu jdk's
     pub const ZULU22_LINUX_AARCH64: &str =
@@ -109,17 +109,6 @@ pub mod constants {
     pub const GRAAL21_MACOS_X86_64: &str =
         "https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz";
 
-    pub const GRAAL17_LINUX_X86_64: &str =
-        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_linux-x64_bin.tar.gz";
-    pub const GRAAL17_LINUX_AARCH64: &str =
-        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_linux-aarch64_bin.tar.gz";
-    pub const GRAAL17_WINDOWS: &str =
-        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_windows-x64_bin.zip";
-    pub const GRAAL17_MACOS_AARCH64: &str =
-        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_macos-aarch64_bin.tar.gz";
-    pub const GRAAL17_MACOS_X86_64: &str =
-        "https://download.oracle.com/graalvm/17/latest/graalvm-jdk-17_macos-x64_bin.tar.gz";
-
     pub fn get_constant(key: &str) -> Option<&'static str> {
         match key {
             "LINUX_ARTIFACT" => Some(LINUX_ARTIFACT),
@@ -192,12 +181,6 @@ pub mod constants {
             "GRAAL21_WINDOWS" => Some(GRAAL21_WINDOWS),
             "GRAAL21_MACOS_AARCH64" => Some(GRAAL21_MACOS_AARCH64),
             "GRAAL21_MACOS_X86_64" => Some(GRAAL21_MACOS_X86_64),
-
-            "GRAAL17_LINUX_X86_64" => Some(GRAAL17_LINUX_X86_64),
-            "GRAAL17_LINUX_AARCH64" => Some(GRAAL17_LINUX_AARCH64),
-            "GRAAL17_WINDOWS" => Some(GRAAL17_WINDOWS),
-            "GRAAL17_MACOS_AARCH64" => Some(GRAAL17_MACOS_AARCH64),
-            "GRAAL17_MACOS_X86_64" => Some(GRAAL17_MACOS_X86_64),
 
             _ => None,
         }

@@ -46,7 +46,7 @@ jobs:
           mv target/release/jvem_amd64 source/
           tar -czvf ${{ env.LINUX_ARTIFACT }} -C source/ .
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: linux-artifact
           path: ${{ env.LINUX_ARTIFACT }}
@@ -64,7 +64,7 @@ jobs:
           copy target\release\jvem.exe source/
           Compress-Archive -Path source\* -DestinationPath ${{ env.WINDOWS_ARTIFACT }}
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: windows-artifact
           path: ${{ env.WINDOWS_ARTIFACT }}
@@ -82,7 +82,7 @@ jobs:
           mv target/release/jvem source/
           tar -czvf ${{ env.MACOS_ARTIFACT }} -C source/ .
       - name: upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: macos-artifact
           path: ${{ env.MACOS_ARTIFACT }}
@@ -94,17 +94,17 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v2
       - name: download Linux Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: linux-artifact
           path: .
       - name: download Windows Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: windows-artifact
           path: .
       - name: download macOS Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: macos-artifact
           path: .
