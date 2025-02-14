@@ -94,17 +94,17 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v2
       - name: download Linux Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: linux-artifact
           path: .
       - name: download Windows Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: windows-artifact
           path: .
       - name: download macOS Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: macos-artifact
           path: .
