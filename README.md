@@ -1,3 +1,5 @@
+
+
 # JVeM
 
 ![](/public/final-logo-black.png)
@@ -25,7 +27,7 @@ to get started with jvem, refer to the installation instructions and basic usage
 - download the latest version from [releases](https://github.com/anusikh/jvem/releases)
 - add the following lines to `~/.zshrc` or `~/.bashrc`
 	```
-	PATH="$M2_HOME/bin:$PATH"
+	PATH="$HOME/.jvem/maven/bin:$PATH"
 	PATH=$PATH:$HOME/.jvem/java/bin
 	PATH=$PATH:$HOME/.jvem/node/bin
 	JAVA_HOME=$HOME/.jvem/java
