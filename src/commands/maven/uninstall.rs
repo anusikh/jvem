@@ -1,12 +1,9 @@
-use std::fs;
+use std::error::Error;
 
-use crate::utils::file_utils::get_home_dir;
+use crate::commands::common;
+use crate::runtime::Runtime;
 
-pub fn uninstall() {
-    let path = format!("{}/.jvem/maven", get_home_dir());
-    let res = fs::remove_dir_all(path);
-    match res {
-        Ok(_) => println!("maven uninstall successful"),
-        Err(_) => println!("something went wrong uninstalling maven"),
-    }
+/// Uninstall maven from the system.
+pub fn uninstall() -> Result<(), Box<dyn Error>> {
+    common::uninstall(Runtime::Maven, "maven")
 }

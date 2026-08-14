@@ -1,31 +1,9 @@
-use crate::utils::file_utils::{get_home_dir, run_command};
+use std::error::Error;
 
-#[cfg(target_os = "windows")]
-fn deactivate_util() {
-    let output = run_command(
-        "powershell",
-        vec![
-            "-Command",
-            &format!("rm -r {}\\.jvem\\java", get_home_dir()),
-        ],
-    );
-    if output.status.success() {
-        println!("deactivation successful");
-    } else {
-        println!("deactivation failed");
-    }
-}
+use crate::commands::common;
+use crate::runtime::Runtime;
 
-#[cfg(unix)]
-fn deactivate_util() {
-    let output = run_command("rm", vec!["-rf", &format!("{}/.jvem/java", get_home_dir())]);
-    if output.status.success() {
-        println!("deactivation successful");
-    } else {
-        println!("deactivation failed");
-    }
-}
-
-pub fn deactivate() {
-    let _ = deactivate_util();
+/// Deactivate the currently active JDK.
+pub fn deactivate() -> Result<(), Box<dyn Error>> {
+    common::deactivate(Runtime::Java)
 }

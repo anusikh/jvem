@@ -1,5 +1,9 @@
-use crate::utils::file_utils::clean_jvem;
+use std::error::Error;
 
-pub fn clean() {
-    let _ = clean_jvem("java");
+use crate::commands::common;
+use crate::runtime::Runtime;
+
+/// Remove empty JDK version directories.
+pub fn clean() -> Result<(), Box<dyn Error>> {
+    common::clean(Runtime::Java)
 }

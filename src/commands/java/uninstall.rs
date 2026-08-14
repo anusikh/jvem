@@ -1,34 +1,9 @@
-use crate::utils::file_utils::{get_installation_dir, run_command};
+use std::error::Error;
 
-#[cfg(target_os = "windows")]
-fn uninstall_util(name: &str) {
-    let output = run_command(
-        "powershell",
-        vec![
-            "-Command",
-            &format!("rm -r {}", get_installation_dir(&name, "java")),
-        ],
-    );
-    if output.status.success() {
-        println!("uninstall successful");
-    } else {
-        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
-    }
-}
+use crate::commands::common;
+use crate::runtime::Runtime;
 
-#[cfg(unix)]
-fn uninstall_util(name: &str) {
-    let output = run_command(
-        "rm",
-        vec!["-rf", &format!("{}", get_installation_dir(&name, "java"))],
-    );
-    if output.status.success() {
-        println!("uninstall successful ");
-    } else {
-        println!("uninstall failed: maybe the mentioned jdk is not installed locally");
-    }
-}
-
-pub fn uninstall(name: String) {
-    let _ = uninstall_util(&name);
+/// Uninstall an installed JDK, e.g. `jvem java uninstall zulu17`.
+pub fn uninstall(name: String) -> Result<(), Box<dyn Error>> {
+    common::uninstall(Runtime::Java, &name)
 }
