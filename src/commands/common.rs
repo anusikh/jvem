@@ -59,17 +59,21 @@ pub async fn use_version(runtime: Runtime, name: &str) -> Result<(), Box<dyn Err
 
 #[cfg(target_os = "windows")]
 async fn use_version_impl(runtime: Runtime, name: String) -> Result<(), Box<dyn Error>> {
+    let link = file_utils::symlink_path(runtime);
+    let install = file_utils::install_dir(runtime, &name);
+    let install_for_java_home = install.clone();
+
     let symlink_task = tokio::spawn(async move {
         println!("creating symlink...");
-        let _ = fs::remove_dir_all(file_utils::symlink_path(runtime));
+        let _ = fs::remove_dir_all(&link);
         let output = run_command(
             "powershell",
             &[
                 "-Command",
                 &format!(
                     "New-Item -Path {} -ItemType Junction -Value {}",
-                    file_utils::symlink_path(runtime).display(),
-                    file_utils::install_dir(runtime, &name).display()
+                    link.display(),
+                    install.display()
                 ),
             ],
         );
@@ -89,7 +93,7 @@ async fn use_version_impl(runtime: Runtime, name: String) -> Result<(), Box<dyn 
                     "-Command",
                     &format!(
                         "[System.Environment]::SetEnvironmentVariable('JAVA_HOME','{}',[System.EnvironmentVariableTarget]::User)",
-                        file_utils::install_dir(runtime, &name).display()
+                        install_for_java_home.display()
                     ),
                 ],
             );
