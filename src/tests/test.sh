@@ -3,6 +3,7 @@
 assert() {
   local output="$1"
   local expected_output="$2"
+  echo $output $expected_output
   if [ "$output" == "$expected_output" ]; then
     echo "[passed]"
   else
