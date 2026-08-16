@@ -1,5 +1,8 @@
-use crate::utils::env_ops::read_versions_node;
+use std::error::Error;
 
-pub fn lsrem() {
-    let _ = read_versions_node();
+use crate::utils::env_ops;
+
+/// List node versions available for install.
+pub fn lsrem() -> Result<(), Box<dyn Error>> {
+    env_ops::list_available_node()
 }

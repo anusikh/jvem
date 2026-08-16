@@ -1,16 +1,16 @@
-pub mod commands;
-pub mod constants;
-pub mod tests;
-pub mod utils;
+mod commands;
+mod constants;
+mod runtime;
+#[cfg(test)]
+mod tests;
+mod utils;
 
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc,
-};
+use std::error::Error;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use commands::{java, maven, node};
-use tokio::signal;
+
+type AppResult = Result<(), Box<dyn Error>>;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -21,194 +21,142 @@ struct Cli {
 
 #[derive(Debug, Clone, Subcommand)]
 enum Lang {
-    #[clap(about = "java version management")]
+    /// Java version management
     Java {
-        // #[arg(short, long, value_enum, help = "the Java action to perform")]
-        #[clap(help = "the java action to be performed")]
-        action: Option<Command>,
+        /// The action to perform
+        action: Option<JavaAction>,
+        /// The JDK name, e.g. `zulu17` (required by install/uninstall/usev)
         param: Option<String>,
     },
-    #[clap(about = "maven management")]
+    /// Maven management
     Maven {
-        #[clap(help = "the maven action to be performed")]
-        action: Option<MavenCommand>,
+        /// The action to perform
+        action: Option<MavenAction>,
     },
-    #[clap(about = "node version management")]
+    /// Node version management
     Node {
-        action: Option<NodeCommand>,
+        /// The action to perform
+        action: Option<NodeAction>,
+        /// The node version, e.g. `22.11.0` (required by install/uninstall/usev)
         param: Option<String>,
     },
 }
 
 #[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
-enum Command {
-    #[clap(help = "install the specific JDK")]
+enum JavaAction {
+    /// Install a JDK, e.g. `jvem java install zulu17`
     Install,
-    #[clap(help = "uninstall the specified JDK version")]
+    /// Uninstall an installed JDK, e.g. `jvem java uninstall zulu17`
     Uninstall,
-    #[clap(help = "use a specific JDK version after installation")]
+    /// Activate an installed JDK, e.g. `jvem java usev zulu17`
     Usev,
-    #[clap(help = "clean empty folders in the .jvem/java_versions directory")]
+    /// Remove empty JDK version directories
     Clean,
-    #[clap(help = "find the currently active JDK version")]
+    /// Show the currently active JDK version
     Current,
-    #[clap(help = "list all JDK versions available for install")]
+    /// List JDK versions available for install
     Lsrem,
-    #[clap(help = "list locally installed JDK versions")]
+    /// List locally installed JDK versions
     Ls,
-    #[clap(help = "deactivate the currently active JDK")]
+    /// Deactivate the currently active JDK
     Deactivate,
 }
 
 #[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
-enum NodeCommand {
-    #[clap(help = "install the specific node version")]
+enum NodeAction {
+    /// Install a node version, e.g. `jvem node install 22.11.0`
     Install,
-    #[clap(help = "uninstall the specified node version")]
+    /// Uninstall a node version, e.g. `jvem node uninstall 22.11.0`
     Uninstall,
-    #[clap(help = "use a specific node version after installation")]
+    /// Activate a node version, e.g. `jvem node usev 22.11.0`
     Usev,
-    #[clap(help = "clean empty folders in the .jvem/node_versions directory")]
+    /// Remove empty node version directories
     Clean,
-    #[clap(help = "find the currently active node version")]
+    /// Show the currently active node and npm versions
     Current,
-    #[clap(help = "list all node versions available for install")]
+    /// List node versions available for install
     Lsrem,
-    #[clap(help = "list locally installed node versions")]
+    /// List locally installed node versions
     Ls,
-    #[clap(help = "deactivate the currently active node version")]
+    /// Deactivate the currently active node version
     Deactivate,
 }
 
 #[derive(Copy, Debug, Clone, PartialEq, Eq, ValueEnum)]
-enum MavenCommand {
-    #[clap(help = "install maven to system")]
+enum MavenAction {
+    /// Install maven to the system
     Install,
-    #[clap(help = "uninstall maven from system")]
+    /// Uninstall maven from the system
     Uninstall,
 }
 
-impl std::str::FromStr for Command {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "install" => Ok(Command::Install),
-            "lsrem" => Ok(Command::Lsrem),
-            "ls" => Ok(Command::Ls),
-            "current" => Ok(Command::Current),
-            "uninstall" => Ok(Command::Uninstall),
-            "usev" => Ok(Command::Usev),
-            "deactivate" => Ok(Command::Deactivate),
-            "clean" => Ok(Command::Clean),
-            _ => Err(format!("invalid Java action: {}", s)),
-        }
-    }
-}
-
-impl std::str::FromStr for NodeCommand {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "install" => Ok(NodeCommand::Install),
-            "lsrem" => Ok(NodeCommand::Lsrem),
-            "ls" => Ok(NodeCommand::Ls),
-            "current" => Ok(NodeCommand::Current),
-            "uninstall" => Ok(NodeCommand::Uninstall),
-            "usev" => Ok(NodeCommand::Usev),
-            "deactivate" => Ok(NodeCommand::Deactivate),
-            "clean" => Ok(NodeCommand::Clean),
-            _ => Err(format!("invalid Node action: {}", s)),
-        }
-    }
-}
-
-impl std::str::FromStr for MavenCommand {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "install" => Ok(MavenCommand::Install),
-            "uninstall" => Ok(MavenCommand::Uninstall),
-            _ => Err(format!("invalid Maven action: {}", s)),
-        }
-    }
-}
-
-async fn handle_java_action(action: Option<Command>, param: Option<String>) {
-    if let Some(action) = action {
-        match action {
-            Command::Install => java::install::install(param.unwrap()),
-            Command::Current => java::current::current(),
-            Command::Uninstall => java::uninstall::uninstall(param.unwrap()),
-            Command::Usev => java::usev::usev(param.unwrap()).await,
-            Command::Lsrem => java::lsrem::lsrem(),
-            Command::Ls => java::ls::ls(),
-            Command::Deactivate => java::deactivate::deactivate(),
-            Command::Clean => java::clean::clean(),
-        }
-    } else {
-        println!("enter valid action. for more details use --help or -h");
-    }
-}
-
-async fn handle_maven_action(action: Option<MavenCommand>) {
-    if let Some(action) = action {
-        match action {
-            MavenCommand::Install => maven::install::install(),
-            MavenCommand::Uninstall => maven::uninstall::uninstall(),
-        }
-    } else {
-        println!("enter valid action, for more details use --help or -h");
-    }
-}
-
-async fn handle_nodejs_action(action: Option<NodeCommand>, param: Option<String>) {
-    if let Some(action) = action {
-        match action {
-            NodeCommand::Lsrem => node::lsrem::lsrem(),
-            NodeCommand::Ls => node::ls::ls(),
-            NodeCommand::Clean => node::clean::clean(),
-            NodeCommand::Current => node::current::current().await,
-            NodeCommand::Deactivate => node::deactivate::deactivate(),
-            NodeCommand::Install => node::install::install(param.unwrap()),
-            NodeCommand::Uninstall => node::uninstall::uninstall(param.unwrap()),
-            NodeCommand::Usev => node::usev::usev(param.unwrap()),
-        }
-    } else {
-        println!("enter valid action, for more details use --help or -h");
-    }
-}
-
-async fn logic(running: Arc<AtomicBool>) {
-    while running.load(Ordering::Relaxed) {
-        match Cli::parse().cmd {
-            Lang::Java { action, param } => handle_java_action(action, param).await,
-            Lang::Maven { action } => handle_maven_action(action).await,
-            Lang::Node { action, param } => handle_nodejs_action(action, param).await,
-        }
-
-        // the below step is important to prevent infinite loop on failure
-        running.store(false, Ordering::Relaxed);
-    }
+/// Extract the version argument for actions that need one, failing with a
+/// usage hint when it is missing.
+fn require_param(
+    tool: &str,
+    action: &str,
+    param: Option<String>,
+) -> Result<String, Box<dyn Error>> {
+    param.ok_or_else(|| {
+        format!("`jvem {tool} {action}` requires a version argument, e.g. `jvem {tool} {action} <version>`").into()
+    })
 }
 
 #[tokio::main]
 async fn main() {
-    // NOTE: the below logic is used for ctrl+c handling
-    // the idea here is to set a boolean atomic value, when program is running
-    // on ctrl+c, the value is set to false and it stops the process
+    let cli = Cli::parse();
+    if let Err(error) = run(cli).await {
+        eprintln!("error: {error}");
+        std::process::exit(1);
+    }
+}
 
-    let running = Arc::new(AtomicBool::new(true));
-    let running_clone = Arc::clone(&running);
-    let sigint = signal::ctrl_c();
-
-    tokio::spawn(async move {
-        let _ = sigint.await;
-        println!("stopping program...");
-        running_clone.store(false, Ordering::Relaxed);
-    });
-
-    logic(running.clone()).await;
+async fn run(cli: Cli) -> AppResult {
+    match cli.cmd {
+        Lang::Java { action: None, .. } => {
+            Err("no action given; run `jvem java --help` for the available actions".into())
+        }
+        Lang::Java {
+            action: Some(action),
+            param,
+        } => match action {
+            JavaAction::Install => java::install::install(require_param("java", "install", param)?),
+            JavaAction::Uninstall => {
+                java::uninstall::uninstall(require_param("java", "uninstall", param)?)
+            }
+            JavaAction::Usev => java::usev::usev(require_param("java", "usev", param)?).await,
+            JavaAction::Clean => java::clean::clean(),
+            JavaAction::Current => java::current::current().await,
+            JavaAction::Lsrem => java::lsrem::lsrem(),
+            JavaAction::Ls => java::ls::ls(),
+            JavaAction::Deactivate => java::deactivate::deactivate(),
+        },
+        Lang::Maven { action: None } => {
+            Err("no action given; run `jvem maven --help` for the available actions".into())
+        }
+        Lang::Maven {
+            action: Some(action),
+        } => match action {
+            MavenAction::Install => maven::install::install(),
+            MavenAction::Uninstall => maven::uninstall::uninstall(),
+        },
+        Lang::Node { action: None, .. } => {
+            Err("no action given; run `jvem node --help` for the available actions".into())
+        }
+        Lang::Node {
+            action: Some(action),
+            param,
+        } => match action {
+            NodeAction::Install => node::install::install(require_param("node", "install", param)?),
+            NodeAction::Uninstall => {
+                node::uninstall::uninstall(require_param("node", "uninstall", param)?)
+            }
+            NodeAction::Usev => node::usev::usev(require_param("node", "usev", param)?).await,
+            NodeAction::Clean => node::clean::clean(),
+            NodeAction::Current => node::current::current().await,
+            NodeAction::Lsrem => node::lsrem::lsrem(),
+            NodeAction::Ls => node::ls::ls(),
+            NodeAction::Deactivate => node::deactivate::deactivate(),
+        },
+    }
 }

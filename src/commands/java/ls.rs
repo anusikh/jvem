@@ -1,5 +1,9 @@
-use crate::utils::file_utils::check_list_locally;
+use std::error::Error;
 
-pub fn ls() {
-    let _ = check_list_locally("java");
+use crate::commands::common;
+use crate::runtime::Runtime;
+
+/// List locally installed JDK versions.
+pub fn ls() -> Result<(), Box<dyn Error>> {
+    common::list_local(Runtime::Java)
 }

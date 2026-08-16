@@ -1,10 +1,9 @@
-use crate::utils::file_utils::run_command;
+use std::error::Error;
 
-pub fn current() {
-    let res = run_command("java", vec!["--version"]);
-    if res.status.success() {
-        println!("java version: {}", String::from_utf8_lossy(&res.stdout));
-    } else {
-        println!("failed: node not set");
-    }
+use crate::commands::common;
+use crate::runtime::Runtime;
+
+/// Show the currently active JDK version.
+pub async fn current() -> Result<(), Box<dyn Error>> {
+    common::current(Runtime::Java).await
 }

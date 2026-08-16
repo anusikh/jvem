@@ -1,37 +1,9 @@
-use crate::utils::file_utils::{get_installation_dir, run_command};
+use std::error::Error;
 
-#[cfg(target_os = "windows")]
-fn uninstall_util(version: &str) {
-    let output = run_command(
-        "powershell",
-        vec![
-            "-Command",
-            &format!("rm -r {}", get_installation_dir(&version, "node")),
-        ],
-    );
-    if output.status.success() {
-        println!("uninstall successful");
-    } else {
-        println!("uninstall failed: maybe the mentioned node version is not installed locally");
-    }
-}
+use crate::commands::common;
+use crate::runtime::Runtime;
 
-#[cfg(unix)]
-fn uninstall_util(version: &str) {
-    let output = run_command(
-        "rm",
-        vec![
-            "-rf",
-            &format!("{}", get_installation_dir(&version, "node")),
-        ],
-    );
-    if output.status.success() {
-        println!("uninstall successful ");
-    } else {
-        println!("uninstall failed: maybe the mentioned node version is not installed locally");
-    }
-}
-
-pub fn uninstall(version: String) {
-    let _ = uninstall_util(&version);
+/// Uninstall a node version, e.g. `jvem node uninstall 22.11.0`.
+pub fn uninstall(version: String) -> Result<(), Box<dyn Error>> {
+    common::uninstall(Runtime::Node, &version)
 }

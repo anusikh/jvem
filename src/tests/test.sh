@@ -25,7 +25,7 @@ starts_with() {
 echo "node version management tests....."
 target/release/jvem node install 21.7.3
 target/release/jvem node install 22.5.0
-output=$(target/release/jvem node ls)
+output=$(target/release/jvem node ls | sort -V)
 expected_output=$(
 cat <<EOF
 21.7.3
